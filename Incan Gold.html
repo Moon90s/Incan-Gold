@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Incan Gold - Deluxe Board Game</title>
+  <style>
+    /* =========================================
+       พื้นที่สำหรับใส่ URL รูปภาพอาร์ตเวิร์คของคุณ (เปลี่ยน URL ในวงเล็บ)
+       ========================================= */
+    :root {
+      --bg-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop');
+      --card-back-img: url('https://placehold.co/200x300/2b3044/c59b27?text=Card+Back');
+      --tent-icon-img: url('https://placehold.co/100x100/3b82f6/fff?text=Tent');
+      
+      /* ภาพการ์ดวิหาร (ใช้นับรอบ 1-5) */
+      --temple-1: url('https://placehold.co/150x100/1c1e2b/fff?text=Round+1');
+      --temple-2: url('https://placehold.co/150x100/1c1e2b/fff?text=Round+2');
+      --temple-3: url('https://placehold.co/150x100/1c1e2b/fff?text=Round+3');
+      --temple-4: url('https://placehold.co/150x100/1c1e2b/fff?text=Round+4');
+      --temple-5: url('https://placehold.co/150x100/1c1e2b/fff?text=Round+5');
+
+      /* ภาพหน้าการ์ดต่างๆ */
+      --img-treasure: url(''); 
+      --img-artifact: url('');
+      --img-hazard-spider: url('');
+      --img-hazard-snake: url('');
+      --img-hazard-fire: url('');
+      --img-hazard-rock: url('');
+      --img-hazard-mummy: url('');
+      
+      /* Colors */
+      --panel: rgba(25, 28, 43, 0.95);
+      --border-gold: #d4af37;
+      --gold: #f59e0b;
+      --ruby: #ef4444;
+      --emerald: #10b981;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { 
+      background-image: var(--bg-image); background-size: cover; background-position: center; background-attachment: fixed;
+      color: var(--text); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 10px; 
+    }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 18, 0.85); z-index: -1; }
+
+    /* Layout: รองรับ PC และ Mobile */
+    .game-layout {
+      width: 100%; max-width: 1100px; display: none; gap: 15px; margin-top: 10px;
+    }
+    .main-column { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .side-column { width: 320px; display: flex; flex-direction: column; gap: 12px; }
+
+    @media(max-width: 850px) {
+      .game-layout { display: flex; flex-direction: column; }
+      .side-column { width: 100%; }
+    }
+
+    /* Lobby */
+    #lobbyScreen { width: 100%; max-width: 500px; display: flex; flex-direction: column; margin: auto; margin-top: 5vh; }
+    .lobby-box { background: var(--panel); border: 2px solid var(--border-gold); border-radius: 16px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+    .lobby-box h1 { color: var(--gold); font-size: 2.2rem; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(245,158,11,0.5); }
+    .input-group { display: flex; flex-direction: column; gap: 15px; text-align: left; margin-bottom: 25px; }
+    .input-group input, .input-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #475569; background: rgba(15, 23, 42, 0.8); color: white; font-size: 1rem; }
+    .btn-primary { background: linear-gradient(to bottom, #f59e0b, #d97706); color: #000; width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);}
+    .btn-primary:active { transform: scale(0.97); }
+
+    /* Temple Round Cards */
+    .temple-row { display: flex; justify-content: space-between; gap: 5px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; border: 1px solid #33384f; }
+    .temple-card { 
+      flex: 1; aspect-ratio: 3/2; background-size: cover; background-position: center; border-radius: 6px; 
+      border: 1px solid #475569; opacity: 0.4; filter: grayscale(100%); transition: 0.4s; position: relative;
+    }
+    .temple-card.active { opacity: 1; filter: grayscale(0%); border-color: var(--border-gold); box-shadow: 0 0 10px rgba(212,175,55,0.5); }
+    
+    /* Players Grid */
+    .players-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    @media(max-width: 500px){ .players-grid { grid-template-columns: repeat(2, 1fr); } }
+    
+    .player-card {
+      background: rgba(22, 24, 36, 0.9); border: 1px solid #33384f; border-radius: 10px;
+      padding: 10px; display: flex; flex-direction: column; gap: 6px; transition: 0.3s; position: relative;
+    }
+    .player-card.you { border-color: var(--border-gold); }
+    .player-card.escaped { opacity: 0.45; border-color: #3b82f6; }
+    .p-header { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; align-items: center;}
+    .p-status { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+    .status-in { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+    .status-camp { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .p-gems { display: flex; justify-content: space-between; font-size: 0.8rem; }
+    
+    /* Floating VFX */
+    .float-text {
+      position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-weight: 900;
+      animation: floatUp 1.2s ease-out forwards; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;
+    }
+    @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -30px) scale(1.3); } }
+
+    /* Path Area */
+    .path-section {
+      background: rgba(15, 17, 26, 0.85); border: 1px solid #2e344d; border-radius: 14px;
+      padding: 12px; display: flex; flex-direction: column; gap: 8px; min-height: 220px;
+    }
+    .cards-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; align-items: center; perspective: 1000px; }
+    .cards-scroll::-webkit-scrollbar { height: 6px; }
+    .cards-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+    /* Cards */
+    .card-wrapper { width: 85px; height: 125px; flex-shrink: 0; perspective: 800px; }
+    .card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: 0.5s; transform: rotateY(180deg); }
+    .card-inner.flipped { transform: rotateY(0deg); }
+    .card-front, .card-back {
+      position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; background-size: cover; background-position: center;
+    }
+    .card-back { background-image: var(--card-back-img); transform: rotateY(180deg); border: 2px solid #5a6488; }
+    .card-front { background-color: #202436; border: 2px solid var(--border-gold); padding: 4px; text-align: center; }
+    
+    .card-icon { font-size: 2.2rem; }
+    .card-label { font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+    .card-leftover {
+      position: absolute; top: -6px; right: -6px; background: var(--gold); color: #000;
+      font-size: 0.8rem; font-weight: 900; padding: 2px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+    }
+    .hazard-duplicate { animation: pulseWarn 0.6s infinite alternate; }
+    @keyframes pulseWarn { from { box-shadow: 0 0 5px var(--ruby); transform: scale(1); } to { box-shadow: 0 0 15px var(--ruby); transform: scale(1.05); } }
+
+    /* Controls */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .action-card-btn {
+      background: var(--panel); border: 2px solid #3b4261; padding: 15px; border-radius: 12px; color: var(--text); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .action-card-btn:active { transform: scale(0.96); }
+    .action-card-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-explore { border-color: var(--emerald); }
+    .btn-return { border-color: #3b82f6; }
+    .btn-act-icon { font-size: 1.8rem; }
+    .btn-act-title { font-size: 1rem; font-weight: 800; }
+
+    /* Log Panel */
+    .log-panel {
+      background: rgba(17, 19, 29, 0.95); border: 1px solid #282c40; border-radius: 14px;
+      padding: 12px; height: 100%; min-height: 300px; display: flex; flex-direction: column;
+    }
+    .log-panel h3 { font-size: 1rem; color: var(--border-gold); margin-bottom: 10px; border-bottom: 1px solid #33384f; padding-bottom: 5px; }
+    .log-box { flex: 1; overflow-y: auto; font-size: 0.85rem; color: var(--subtext); display: flex; flex-direction: column; gap: 6px; }
+    .log-entry { padding: 4px; border-radius: 6px; background: rgba(255,255,255,0.03); line-height: 1.4; }
+    .log-alert { color: var(--ruby); font-weight: 700; }
+    .log-gold { color: #fde047; font-weight: 700; }
+    .log-art { color: #38bdf8; font-weight: 700; text-shadow: 0 0 5px rgba(56,189,248,0.5); }
+
+    /* Modal Summary */
+    .modal {
+      display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    .modal-content {
+      background: var(--panel); padding: 30px; border: 2px solid var(--border-gold); border-radius: 16px;
+      text-align: center; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    }
+    .modal-content h2 { color: var(--gold); margin-bottom: 20px; font-size: 1.8rem; }
+    .rank-list { text-align: left; margin-bottom: 25px; display: flex; flex-direction: column; gap: 8px; }
+    .rank-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; font-weight: bold; display: flex; justify-content: space-between; }
+    .rank-1 { border: 1px solid var(--gold); background: rgba(245, 158, 11, 0.1); }
+  </style>
+</head>
+<body>
+<div class="overlay"></div>
+
+<!-- LOBBY SCREEN -->
+<div id="lobbyScreen">
+  <div class="lobby-box">
+    <h1>Incan Gold</h1>
+    <div class="input-group">
+      <label>ชื่อของคุณ:</label>
+      <input type="text" id="playerNameInput" value="นักสำรวจ" maxlength="12">
+      <label>จำนวนผู้เล่นบอท (AI):</label>
+      <select id="botCountInput">
+        <option value="2">2 บอท (เล่น 3 คน)</option>
+        <option value="3">3 บอท (เล่น 4 คน)</option>
+        <option value="4">4 บอท (เล่น 5 คน)</option>
+        <option value="5">5 บอท (เล่น 6 คน)</option>
+        <option value="6">6 บอท (เล่น 7 คน)</option>
+        <option value="7" selected>7 บอท (เล่น 8 คน เต็มตี้)</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="startGame()">เริ่มผจญภัย</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="game-layout" id="gameLayout">
+  <!-- ฝั่งซ้าย: กระดานหลัก -->
+  <div class="main-column">
+    
+    <!-- แทบการ์ดวิหารนับรอบ -->
+    <div class="temple-row">
+      <div class="temple-card" id="tcard-1" style="background-image: var(--temple-1);"></div>
+      <div class="temple-card" id="tcard-2" style="background-image: var(--temple-2);"></div>
+      <div class="temple-card" id="tcard-3" style="background-image: var(--temple-3);"></div>
+      <div class="temple-card" id="tcard-4" style="background-image: var(--temple-4);"></div>
+      <div class="temple-card" id="tcard-5" style="background-image: var(--temple-5);"></div>
+    </div>
+
+    <!-- ลานผู้เล่น -->
+    <div class="players-grid" id="playersGrid"></div>
+
+    <!-- ทางเดินวิหาร -->
+    <div class="path-section">
+      <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+        <span>เศษสมบัติตกค้าง: <span id="pathRemainder" style="color:var(--gold);">0</span> 💎</span>
+        <span id="dangerLevel">สภาวะ: ปลอดภัย</span>
+      </div>
+      <div class="cards-scroll" id="cardsScroll"></div>
+    </div>
+
+    <!-- แอคชัน -->
+    <div id="controlsArea">
+      <div class="action-row" id="decisionControls">
+        <button class="action-card-btn btn-explore" id="exploreBtn" onclick="handleChoice('explore')">
+          <span class="btn-act-icon">🔦</span><span class="btn-act-title">ลุยต่อ</span>
+        </button>
+        <button class="action-card-btn btn-return" id="returnBtn" onclick="handleChoice('return')">
+          <span class="btn-act-icon">⛺</span><span class="btn-act-title">กลับเต็นท์</span>
+        </button>
+      </div>
+      <button class="btn-primary" id="nextRoundBtn" style="display:none;" onclick="startNewRound()">เข้าสู่วิหารถัดไป ➡️</button>
+    </div>
+  </div>
+
+  <!-- ฝั่งขวา: Log -->
+  <div class="side-column">
+    <div class="log-panel">
+      <h3>บันทึกการเดินทาง</h3>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUMMARY -->
+<div id="summaryModal" class="modal">
+  <div class="modal-content">
+    <h2>🏆 จบการสำรวจ 5 วิหาร</h2>
+    <div class="rank-list" id="rankList"></div>
+    <button class="btn-primary" onclick="location.reload()">เล่นใหม่อีกครั้ง 🔄</button>
+  </div>
+</div>
+
+<script>
+  /* --- Audio System --- */
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playSFX(type) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    if(type === 'flip') {
+      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(220, now); osc.frequency.exponentialRampToValueAtTime(60, now+0.12);
+      gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now+0.12);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(now+0.12);
+    } else if(type === 'gem') {
+      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(1400, now);
+      gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.4);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(now+0.4);
+    } else if(type === 'collapse') {
+      const bs = audioCtx.sampleRate * 0.6; const buf = audioCtx.createBuffer(1, bs, audioCtx.sampleRate);
+      const data = buf.getChannelData(0); for(let i=0; i<bs; i++) data[i] = Math.random()*2-1;
+      const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+      const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(400, now); filter.frequency.linearRampToValueAtTime(40, now+0.6);
+      const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.7, now); gain.gain.linearRampToValueAtTime(0, now+0.6);
+      noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(); noise.stop(now+0.6);
+    }
+  }
+
+  /* --- Game Constants --- */
+  const TREASURE_VALS = [1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17];
+  const HAZARD_TYPES = [
+    { type: 'spider', name: 'แมงมุม', icon: '🕷️', var: 'var(--img-hazard-spider)' }, 
+    { type: 'snake', name: 'งูพิษ', icon: '🐍', var: 'var(--img-hazard-snake)' },
+    { type: 'fire', name: 'ไฟ', icon: '🔥', var: 'var(--img-hazard-fire)' }, 
+    { type: 'rock', name: 'หิน', icon: '🪨', var: 'var(--img-hazard-rock)' }, 
+    { type: 'mummy', name: 'มัมมี่', icon: '🧟', var: 'var(--img-hazard-mummy)' }
+  ];
+  
+  // AI Personalities
+  const BOT_PROFILES = [
+    { n:'แดน', p:'daredevil' }, { n:'ลินดา', p:'cautious' }, { n:'โอเว่น', p:'smart' },
+    { n:'ซาร่า', p:'greedy' }, { n:'แจ็ค', p:'chaotic' }, { n:'เอมมี่', p:'chill' }, { n:'เลโอ', p:'smart' }
+  ];
+
+  let players = [];
+  let currentRound = 1;
+  let deck = [];
+  let currentPathCards = [];
+  let pathRemainder = 0;
+  let activeHazardsOnPath = [];
+  let isRoundOver = false;
+
+  let hazardCounts = { spider: 3, snake: 3, fire: 3, rock: 3, mummy: 3 };
+  let undrawnArtifacts = 0;
+  let artifactsClaimed = 0; 
+
+  function startGame() {
+    const pName = document.getElementById('playerNameInput').value || 'You';
+    const botCount = parseInt(document.getElementById('botCountInput').value);
+
+    players = [{ id: 0, name: pName, isAI: false, inTemple: true, bag: 0, chest: 0, profile: null }];
+    let bots = [...BOT_PROFILES].sort(() => 0.5 - Math.random());
+    for(let i=0; i<botCount; i++) {
+      players.push({ id: i+1, name: bots[i].n, isAI: true, inTemple: true, bag: 0, chest: 0, profile: bots[i].p });
+    }
+
+    hazardCounts = { spider: 3, snake: 3, fire: 3, rock: 3, mummy: 3 };
+    undrawnArtifacts = 0; artifactsClaimed = 0;
+
+    document.getElementById('lobbyScreen').style.display = 'none';
+    document.getElementById('gameLayout').style.display = 'flex';
+    
+    currentRound = 1;
+    startNewRound();
+  }
+
+  function startNewRound() {
+    isRoundOver = false; currentPathCards = []; activeHazardsOnPath = []; pathRemainder = 0;
+    players.forEach(p => { p.inTemple = true; p.bag = 0; });
+
+    // Highlight Temple Card (อัปเดตการ์ดที่ 1-5 ตามรอบ)
+    for(let i=1; i<=5; i++) {
+      document.getElementById(`tcard-${i}`).className = i === currentRound ? 'temple-card active' : 'temple-card';
+    }
+
+    undrawnArtifacts += 1; // เพิ่มโบราณวัตถุลงไปผสมทุกรอบตามกติกา
+    deck = [];
+    TREASURE_VALS.forEach(v => deck.push({ type: 'treasure', value: v, icon: '💎', var: 'var(--img-treasure)' }));
+    HAZARD_TYPES.forEach(h => {
+      for(let i=0; i<hazardCounts[h.type]; i++) deck.push({ type: 'hazard', hType: h.type, name: h.name, icon: h.icon, var: h.var });
+    });
+    for(let i=0; i<undrawnArtifacts; i++) {
+      deck.push({ type: 'artifact', name: 'โบราณวัตถุ', icon: artifactsClaimed < 3 ? '👑' : '🪙', var: 'var(--img-artifact)', claimed: false });
+    }
+    deck = deck.sort(() => 0.5 - Math.random());
+
+    document.getElementById('cardsScroll').innerHTML = ''; 
+    document.getElementById('decisionControls').style.display = 'grid';
+    document.getElementById('nextRoundBtn').style.display = 'none';
+    
+    updateUI();
+    log(`<b>เริ่มวิหารรอบที่ ${currentRound}/5</b>`);
+    setTimeout(drawCard, 500);
+  }
+
+  function drawCard() {
+    if(deck.length === 0) return;
+    const card = deck.pop();
+    currentPathCards.push(card);
+    const idx = currentPathCards.length - 1;
+
+    if(card.type === 'artifact') undrawnArtifacts -= 1;
+
+    playSFX('flip');
+    renderCard(card, idx);
+    setTimeout(() => processCard(card, idx), 500);
+  }
+
+  function renderCard(card, idx) {
+    const sc = document.getElementById('cardsScroll');
+    const w = document.createElement('div');
+    w.className = 'card-wrapper'; w.id = `cWrap-${idx}`;
+
+    let cClass = 'card-front', valText = '', bgImg = card.var;
+    if (card.type === 'treasure') { valText = `+${card.value}`; }
+    else if (card.type === 'hazard') { cClass += ' hazard-card'; valText = card.name; }
+    else if (card.type === 'artifact') { cClass += ' artifact-card'; valText = `?`; }
+
+    w.innerHTML = `
+      <div class="card-inner" id="cIn-${idx}">
+        <div class="card-back"></div>
+        <div class="${cClass}" id="cFront-${idx}" style="background-image: ${bgImg};">
+          <div class="card-icon">${card.icon}</div>
+          <div class="card-label">${valText}</div>
+          <div class="card-leftover" id="cLoot-${idx}" style="display:none;"></div>
+        </div>
+      </div>
+    `;
+    sc.appendChild(w);
+    sc.scrollLeft = sc.scrollWidth;
+    requestAnimationFrame(() => setTimeout(() => { document.getElementById(`cIn-${idx}`).classList.add('flipped'); }, 50));
+  }
+
+  function showFloatVFX(playerId, text, color) {
+    const pCard = document.getElementById(`player-${playerId}`);
+    if(!pCard) return;
+    const f = document.createElement('div');
+    f.className = 'float-text'; f.style.color = color; f.innerText = text;
+    pCard.appendChild(f);
+    setTimeout(() => f.remove(), 1200);
+  }
+
+  function processCard(card, idx) {
+    const inTemple = players.filter(p => p.inTemple);
+
+    if (card.type === 'treasure') {
+      const share = Math.floor(card.value / inTemple.length);
+      const leftover = card.value % inTemple.length;
+      pathRemainder += leftover;
+      
+      inTemple.forEach(p => {
+        p.bag += share;
+        if(share > 0) showFloatVFX(p.id, `+${share}`, '#10b981'); // Effect แบ่งสมบัติ
+      });
+      playSFX('gem');
+      log(`💎 สมบัติ ${card.value} ได้คนละ <b>+${share}</b>`);
+      
+      if(leftover > 0) {
+        const bdg = document.getElementById(`cLoot-${idx}`);
+        if(bdg){ bdg.innerText = `+${leftover}`; bdg.style.display = 'block'; }
+      }
+    } 
+    else if (card.type === 'hazard') {
+      if (activeHazardsOnPath.includes(card.hType)) {
+        document.getElementById(`cFront-${idx}`).classList.add('hazard-duplicate');
+        playSFX('collapse');
+        hazardCounts[card.hType] -= 1; // กฎถอดกับดักออก 1 ใบเมื่อแตก
+        log(`<span class="log-alert">💥 วิหารถล่ม! กับดัก ${card.name} ออกซ้ำ</span>`);
+        
+        inTemple.forEach(p => { p.bag = 0; p.inTemple = false; showFloatVFX(p.id, '💔 แตก!', '#ef4444'); });
+        
+        updateUI(); endRound(); return;
+      } else {
+        activeHazardsOnPath.push(card.hType);
+        log(`⚠️ เตือนภัย! เจอ ${card.name}`);
+      }
+    } 
+    else if (card.type === 'artifact') {
+      playSFX('gem');
+      log(`<span class="log-art">👑 เจอโบราณวัตถุ!</span>`);
+    }
+
+    updateUI();
+    if(!players[0].inTemple) {
+      setTimeout(() => handleChoice('return'), 1000);
+    } else {
+      document.getElementById('exploreBtn').disabled = false;
+      document.getElementById('returnBtn').disabled = false;
+    }
+  }
+
+  function handleChoice(humanAction) {
+    document.getElementById('exploreBtn').disabled = true; document.getElementById('returnBtn').disabled = true;
+
+    const decisions = {};
+    players.forEach(p => {
+      if(!p.inTemple) return;
+      decisions[p.id] = p.isAI ? calcBot(p) : humanAction;
+    });
+
+    const returners = players.filter(p => p.inTemple && decisions[p.id] === 'return');
+    const continuers = players.filter(p => p.inTemple && decisions[p.id] === 'explore');
+
+    if (returners.length > 0) {
+      const sRem = Math.floor(pathRemainder / returners.length);
+      pathRemainder = pathRemainder % returners.length;
+
+      returners.forEach(p => {
+        p.bag += sRem; p.chest += p.bag; p.inTemple = false;
+        
+        // Effect เก็บตก
+        if(sRem > 0) showFloatVFX(p.id, `+${sRem} เก็บตก!`, '#f59e0b');
+        log(`⛺ <b>${p.name.split(' ')[0]}</b> กลับเต็นท์ (เซฟ +${p.bag})`);
+        p.bag = 0;
+      });
+      document.querySelectorAll('.card-leftover').forEach(e => e.style.display='none');
+
+      // กฎกวาด Artifact (มีคนกลับแค่ 1 คนเท่านั้นถึงจะได้)
+      if (returners.length === 1) {
+        currentPathCards.forEach((c, i) => {
+          if(c.type === 'artifact' && !c.claimed) {
+            c.claimed = true;
+            artifactsClaimed += 1;
+            const pts = artifactsClaimed <= 3 ? 5 : 10;
+            returners[0].chest += pts;
+            document.getElementById(`cWrap-${i}`).style.opacity = '0.3';
+            showFloatVFX(returners[0].id, `✨ ได้วัตถุโบราณ!`, '#38bdf8'); // Effect วัตถุโบราณ
+            log(`<span class="log-art">✨ ${returners[0].name.split(' ')[0]} โฉบโบราณวัตถุไปคนเดียว! (+${pts} แต้ม)</span>`);
+          }
+        });
+      }
+    }
+
+    updateUI();
+    if(continuers.length === 0) { endRound(); } else { setTimeout(drawCard, 800); }
+  }
+
+  /* --- Advanced AI Logic --- */
+  function calcBot(bot) {
+    const prof = bot.profile;
+    const hz = activeHazardsOnPath.length;
+    const hasArt = currentPathCards.some(c => c.type === 'artifact' && !c.claimed);
+    const inT = players.filter(p => p.inTemple).length;
+    
+    if(prof === 'chaotic') return Math.random() < 0.5 ? 'explore' : 'return';
+    if(prof === 'chill') {
+      if(hz >= 1 && bot.bag > 3) return 'return';
+      return Math.random() < 0.6 ? 'explore' : 'return';
+    }
+    
+    // AI ที่ฉลาดและมีการคิดคำนวณซับซ้อนขึ้น
+    if(prof === 'smart') {
+      if(hasArt && inT <= 2) return 'return'; // โอกาสคว้า Artifact เมื่อคนเหลือน้อย
+      if(hz >= 2 && bot.bag >= 8) return 'return';
+      if(hz >= 3) return Math.random() < 0.8 ? 'return' : 'explore';
+      if(pathRemainder >= 4) return 'return'; // เห็นเศษตกเยอะ รีบชิ่งกลับ
+      return 'explore';
+    }
+    if(prof === 'cautious') {
+      if(hz >= 2) return 'return';
+      if(bot.bag >= 6) return 'return';
+      return 'explore';
+    }
+    if(prof === 'greedy') {
+      if(hz >= 3 && bot.bag >= 15) return 'return';
+      if(hz >= 4) return Math.random() < 0.6 ? 'return' : 'explore';
+      return 'explore'; // อยากได้กระเป๋าใหญ่ๆ
+    }
+    if(prof === 'daredevil') {
+      if(hz >= 4) return Math.random() < 0.4 ? 'return' : 'explore';
+      return 'explore'; // บ้าบิ่น ไม่สนกับดัก
+    }
+    
+    return 'explore';
+  }
+
+  function endRound() {
+    isRoundOver = true;
+    document.getElementById('decisionControls').style.display = 'none';
+
+    // เช็กว่าถึงรอบที่ 5 (รอบสุดท้าย) แล้วหรือยัง
+    if (currentRound >= 5) {
+      setTimeout(showFinalScore, 1500);
+    } else {
+      currentRound++; // [บวกตัวเลขรอบเพื่อแก้ไขบั๊กค้างหน้า 1]
+      document.getElementById('nextRoundBtn').style.display = 'block';
+    }
+  }
+
+  function showFinalScore() {
+    updateUI(true); // Reveal all tents
+    const s = [...players].sort((a,b) => b.chest - a.chest);
+    
+    const rList = document.getElementById('rankList');
+    rList.innerHTML = '';
+    s.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = `rank-item ${i===0 ? 'rank-1' : ''}`;
+      el.innerHTML = `<span>#${i+1} ${p.name}</span> <span style="color:var(--gold);">${p.chest} 💎</span>`;
+      rList.appendChild(el);
+    });
+
+    document.getElementById('summaryModal').style.display = 'flex';
+  }
+
+  function updateUI(revealTents = false) {
+    document.getElementById('pathRemainder').innerText = pathRemainder;
+    
+    const dLevel = document.getElementById('dangerLevel');
+    const hz = activeHazardsOnPath.length;
+    dLevel.innerText = hz === 0 ? 'สภาวะ: ปลอดภัย' : `สภาวะ: เสี่ยง (${hz} ชนิด)`;
+    dLevel.style.color = hz > 0 ? 'var(--ruby)' : 'var(--emerald)';
+
+    const pg = document.getElementById('playersGrid');
+    pg.innerHTML = '';
+    players.forEach(p => {
+      const c = document.createElement('div');
+      c.className = `player-card ${p.id===0?'you':''} ${!p.inTemple?'escaped':''}`;
+      c.id = `player-${p.id}`; // For floating VFX targeting
+      
+      const tentStr = (p.id===0 || revealTents) ? p.chest : '?';
+      c.innerHTML = `
+        <div class="p-header"><span>${p.name.split(' ')[0]}</span> <span class="p-status ${p.inTemple?'status-in':'status-camp'}">${p.inTemple?'🏃 ลุย':'⛺ กลับ'}</span></div>
+        <div class="p-gems"><span>เป๋า: <b style="color:#ffd166;">${p.bag}</b></span> <span>⛺ <b>${tentStr}</b></span></div>
+      `;
+      pg.appendChild(c);
+    });
+  }
+
+  function log(msg) {
+    const box = document.getElementById('logBox');
+    const d = document.createElement('div'); d.className = 'log-entry'; d.innerHTML = msg;
+    box.prepend(d);
+  }
+</script>
+</body>
+</html>
