@@ -1057,129 +1057,196 @@
   </script>
 
   <!-- ================= ระบบหลังบ้าน FIREBASE MULTIPLAYER (รองรับคนจริง 4-8 คน + ผสมบอท) ================= -->
-  <script type="module">
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getDatabase, ref, set, get, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     /* =========================================================================
-       ใส่ค่า Firebase Config ของคุณตรงนี้เพื่อเปิดใช้งานออนไลน์ข้ามเครื่องจริง
-       (หากยังไม่ได้ใส่ ระบบจะทำงานในโหมดจำลองห้องบนเครื่องให้ทดสอบได้ทันที)
+       📌 วางค่า firebaseConfig ที่คัดลอกจากเว็บ Firebase Console ของคุณตรงนี้
        ========================================================================= */
-     const firebaseConfig = {
-  apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
-  authDomain: "incan-gold-deluxe.firebaseapp.com",
-  databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "incan-gold-deluxe",
-  storageBucket: "incan-gold-deluxe.firebasestorage.app",
-  messagingSenderId: "1034905115077",
-  appId: "1:1034905115077:web:872d61e27dbc3f7497d3ac",
-  measurementId: "G-GKMNGNKRV9"
-};
-
-    const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
-    let db = null, auth = null, currentRoomCode = null;
-    window.isMultiplayerHost = false;
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+ 	 apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
+  	authDomain: "incan-gold-deluxe.firebaseapp.com",
+  	databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  	projectId: "incan-gold-deluxe",
+  	storageBucket: "incan-gold-deluxe.firebasestorage.app",
+  	messagingSenderId: "1034905115077",
+  	appId: "1:1034905115077:web:ead1c2f72f305c3397d3ac",
+  	measurementId: "G-RG4JJLMFXL"};
 
     const statusEl = document.getElementById('firebaseStatusText');
-    if (isFirebaseConfigured) {
+    let db = null;
+    let currentRoomCode = null;
+    let roomUnsubscribe = null;
+    let lastProcessedTurnKey = "";
+    window.isMultiplayerHost = false;
+
+    // ตรวจสอบความสมบูรณ์ของ firebaseConfig ทันทีที่เปิดหน้าเว็บ
+    const hasValidKey = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+    const hasValidDbUrl = firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes("YOUR_PROJECT");
+
+    if (!hasValidKey) {
+      statusEl.innerHTML = "⚠️ <b>ยังไม่ได้ใส่ firebaseConfig:</b> กรุณานำค่าจาก Firebase Console มาวางในโค้ดท้ายไฟล์ก่อนใช้งานโหมดออนไลน์";
+      statusEl.className = "text-[11px] text-amber-400 text-center leading-snug bg-amber-950/40 p-2 rounded-lg border border-amber-500/40";
+    } else if (!hasValidDbUrl) {
+      statusEl.innerHTML = "❌ <b>ขาดค่า databaseURL ใน firebaseConfig:</b> กรุณาไปกดสร้าง Realtime Database ใน Firebase Console แล้วนำลิงก์ databaseURL มาใส่เพิ่ม";
+      statusEl.className = "text-[11px] text-rose-400 text-center leading-snug bg-rose-950/40 p-2 rounded-lg border border-rose-500/40";
+    } else {
       try {
         const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
         db = getDatabase(app);
-        statusEl.innerText = "🟢 เชื่อมต่อเซิร์ฟเวอร์ Firebase พร้อมเล่นออนไลน์";
-        statusEl.className = "text-[11px] text-emerald-400 text-center";
-      } catch (e) {
-        statusEl.innerText = "⚠️ ตั้งค่า Firebase ไม่ถูกต้อง: กำลังใช้โหมดจำลองห้อง";
+        statusEl.innerHTML = "🟢 <b>พร้อมเล่นออนไลน์:</b> สร้างห้องใหม่ หรือกรอกรหัสห้อง 4 หลักของเพื่อนได้เลย";
+        statusEl.className = "text-[11px] text-emerald-400 text-center leading-snug";
+      } catch (err) {
+        statusEl.innerHTML = "❌ <b>ตั้งค่า Firebase ผิดพลาด:</b> " + err.message;
+        statusEl.className = "text-[11px] text-rose-400 text-center leading-snug";
       }
-    } else {
-      statusEl.innerText = "💡 โหมดพร้อมต่อ Firebase (ใส่ firebaseConfig ในโค้ดเพื่อเล่นข้ามมือถือจริง)";
     }
 
     let waitingRoomPlayers = [];
 
-    async function ensureUserAuth() {
+    // สร้างรหัสประจำตัวผู้เล่นอัตโนมัติโดยไม่ต้องพึ่ง Firebase Authentication
+    function getOrCreatePlayerIdentity() {
       const pName = document.getElementById('playerNameInput').value.trim() || 'นักสำรวจ';
-      if (isFirebaseConfigured && auth) {
-        const res = await signInAnonymously(auth);
-        localPlayerId = res.user.uid;
-      } else {
-        localPlayerId = 'user_' + Math.floor(1000 + Math.random() * 9000);
+      let savedId = sessionStorage.getItem('incan_player_uid');
+      if (!savedId) {
+        savedId = 'p_' + Math.random().toString(36).substring(2, 9);
+        sessionStorage.setItem('incan_player_uid', savedId);
       }
-      return { id: localPlayerId, name: pName };
+      localPlayerId = savedId;
+      return { id: savedId, name: pName };
     }
 
-    // สร้างห้องออนไลน์ใหม่
+    // 1. สร้างห้องออนไลน์ใหม่ (สำหรับหัวหน้าห้อง)
     window.handleCreateOnlineRoom = async function() {
       initAudio();
-      const me = await ensureUserAuth();
-      currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
-      window.isMultiplayerHost = true;
+      if (!db) {
+        alert("ไม่สามารถสร้างห้องออนไลน์ได้ เนื่องจากยังไม่ได้ใส่ค่า firebaseConfig (หรือขาด databaseURL) ในโค้ดท้ายไฟล์ครับ");
+        return;
+      }
 
-      document.getElementById('multiEntryBox').classList.add('hidden');
-      document.getElementById('waitingRoomBox').classList.remove('hidden');
-      document.getElementById('waitingRoomBox').classList.add('flex');
-      document.getElementById('displayRoomCode').innerText = currentRoomCode;
+      try {
+        const me = getOrCreatePlayerIdentity();
+        currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        window.isMultiplayerHost = true;
 
-      waitingRoomPlayers = [{ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0 }];
-      window.updateOnlineBotsCount();
+        waitingRoomPlayers = [{
+          id: me.id,
+          name: me.name,
+          isAI: false,
+          inTemple: true,
+          bag: 0,
+          chest: 0,
+          currentChoice: null
+        }];
 
-      if (isFirebaseConfigured && db) {
+        // คำนวณบอทตามที่ตั้งไว้เริ่มต้น
+        const targetTotal = parseInt(document.getElementById('onlineTargetTotal').value, 10);
+        waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers, targetTotal);
+
         const roomRef = ref(db, `rooms/${currentRoomCode}`);
         await set(roomRef, {
           status: 'waiting',
           hostId: me.id,
           currentRound: 1,
-          players: waitingRoomPlayers
+          pathRemainder: 0,
+          players: waitingRoomPlayers,
+          updatedAt: Date.now()
         });
+
+        document.getElementById('multiEntryBox').classList.add('hidden');
+        document.getElementById('waitingRoomBox').classList.remove('hidden');
+        document.getElementById('waitingRoomBox').classList.add('flex');
+        document.getElementById('hostBotControls').classList.remove('hidden');
+        document.getElementById('btnHostStartOnline').classList.remove('hidden');
+        document.getElementById('displayRoomCode').innerText = currentRoomCode;
+
         subscribeRoom(currentRoomCode);
+      } catch (err) {
+        alert("สร้างห้องไม่สำเร็จ: " + err.message + "\n\n(คำแนะนำ: เช็กที่เมนู Realtime Database > Rules ว่าตั้ง .read และ .write เป็น true หรือยัง)");
       }
     };
 
-    // เข้าร่วมห้องเพื่อน
+    // 2. เข้าร่วมห้องออนไลน์ของเพื่อน
     window.handleJoinOnlineRoom = async function() {
       initAudio();
       const code = document.getElementById('roomCodeInput').value.trim();
-      if (!code) { alert('กรุณากรอกรหัสห้อง 4 หลัก'); return; }
-      const me = await ensureUserAuth();
-
-      if (!isFirebaseConfigured || !db) {
-        alert('กรุณาใส่ค่า firebaseConfig ในโค้ดก่อน เพื่อเชื่อมต่อห้องข้ามเครื่องครับ');
+      if (!code) {
+        alert('กรุณากรอกรหัสห้อง 4 หลักก่อนกดเข้าร่วมครับ');
+        return;
+      }
+      if (!db) {
+        alert('ยังไม่ได้เชื่อมต่อ Firebase! กรุณาใส่ค่า firebaseConfig และ databaseURL ในโค้ดท้ายไฟล์ก่อนครับ');
         return;
       }
 
-      const roomRef = ref(db, `rooms/${code}`);
-      const snap = await get(roomRef);
-      if (!snap.exists()) { alert('ไม่พบรหัสห้องนี้!'); return; }
+      try {
+        const me = getOrCreatePlayerIdentity();
+        const roomRef = ref(db, `rooms/${code}`);
+        const snap = await get(roomRef);
 
-      const data = snap.val();
-      let pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
-      const humans = pList.filter(p => !p.isAI);
-      if (humans.length >= 8) { alert('ห้องเต็มแล้ว (สูงสุด 8 คน)'); return; }
+        if (!snap.exists()) {
+          alert(`ไม่พบห้องหมายเลข "${code}" บนเซิร์ฟเวอร์!\n(ตรวจสอบว่าพิมพ์เลขถูก และเครื่องที่สร้างห้องใช้ firebaseConfig ตัวเดียวกัน)`);
+          return;
+        }
 
-      currentRoomCode = code;
-      window.isMultiplayerHost = (data.hostId === me.id);
-      humans.push({ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0 });
+        const data = snap.val();
+        if (data.status === 'playing' && ! (data.players || []).some(p => String(p.id) === String(me.id))) {
+          alert('ห้องนี้เริ่มเล่นไปแล้ว ไม่สามารถเข้าร่วมกลางคันได้ครับ');
+          return;
+        }
 
-      await update(roomRef, { players: humans });
-      document.getElementById('multiEntryBox').classList.add('hidden');
-      document.getElementById('waitingRoomBox').classList.remove('hidden');
-      document.getElementById('waitingRoomBox').classList.add('flex');
-      document.getElementById('hostBotControls').classList.toggle('hidden', !window.isMultiplayerHost);
-      document.getElementById('btnHostStartOnline').classList.toggle('hidden', !window.isMultiplayerHost);
-      document.getElementById('displayRoomCode').innerText = currentRoomCode;
+        let pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
+        let humans = pList.filter(p => !p.isAI);
+        const existingBots = pList.filter(p => p.isAI);
 
-      subscribeRoom(code);
+        // เช็กว่าเราอยู่ในห้องอยู่แล้วหรือไม่
+        const existingIdx = humans.findIndex(p => String(p.id) === String(me.id));
+        if (existingIdx >= 0) {
+          humans[existingIdx].name = me.name;
+        } else {
+          if (humans.length >= 8) {
+            alert('ห้องนี้มีผู้เล่นเต็ม 8 คนแล้วครับ');
+            return;
+          }
+          humans.push({
+            id: me.id,
+            name: me.name,
+            isAI: false,
+            inTemple: true,
+            bag: 0,
+            chest: 0,
+            currentChoice: null
+          });
+        }
+
+        // ถ้ามีบอทผสมอยู่ ให้ลดบอทออก 1 ตัวเมื่อมีคนจริงเข้ามาแทนที่ เพื่อให้รวมไม่เกิน 8 คน
+        const targetCount = Math.max(humans.length, Math.min(8, pList.length));
+        const updatedList = buildCombinedPlayerList(humans, existingBots.length > 0 ? targetCount : 0);
+
+        currentRoomCode = code;
+        window.isMultiplayerHost = (String(data.hostId) === String(me.id));
+
+        await update(roomRef, { players: updatedList, updatedAt: Date.now() });
+
+        document.getElementById('multiEntryBox').classList.add('hidden');
+        document.getElementById('waitingRoomBox').classList.remove('hidden');
+        document.getElementById('waitingRoomBox').classList.add('flex');
+        document.getElementById('hostBotControls').classList.toggle('hidden', !window.isMultiplayerHost);
+        document.getElementById('btnHostStartOnline').classList.toggle('hidden', !window.isMultiplayerHost);
+        document.getElementById('displayRoomCode').innerText = currentRoomCode;
+
+        subscribeRoom(code);
+      } catch (err) {
+        alert("เข้าร่วมห้องไม่สำเร็จ: " + err.message + "\n\n(คำแนะนำ: ตรวจสอบอินเทอร์เน็ต และเช็ก Realtime Database > Rules ใน Firebase)");
+      }
     };
 
-    // คำนวณการเติมบอทผสมให้ครบตามจำนวนที่หัวหน้าห้องตั้งไว้ (4-8 คน)
-    window.updateOnlineBotsCount = function() {
-      const targetTotal = parseInt(document.getElementById('onlineTargetTotal').value, 10);
-      const humans = waitingRoomPlayers.filter(p => !p.isAI);
-      let combined = [...humans];
-
-      if (targetTotal > humans.length) {
-        const needBots = Math.min(8 - humans.length, targetTotal - humans.length);
+    function buildCombinedPlayerList(humanList, targetTotal) {
+      let combined = [...humanList];
+      if (targetTotal > humanList.length) {
+        const needBots = Math.min(8 - humanList.length, targetTotal - humanList.length);
         for (let i = 0; i < needBots; i++) {
           const b = BOT_PROFILES[i % BOT_PROFILES.length];
           combined.push({
@@ -1191,15 +1258,23 @@
             chest: 0,
             profile: b.p,
             riskBase: b.riskBase,
-            riskMod: 0
+            riskMod: 0,
+            currentChoice: null
           });
         }
       }
-      waitingRoomPlayers = combined;
+      return combined;
+    }
+
+    // อัปเดตจำนวนบอทเมื่อหัวหน้าห้องเปลี่ยนตัวเลือกใน Dropdown
+    window.updateOnlineBotsCount = async function() {
+      const targetTotal = parseInt(document.getElementById('onlineTargetTotal').value, 10);
+      const humans = waitingRoomPlayers.filter(p => !p.isAI);
+      waitingRoomPlayers = buildCombinedPlayerList(humans, targetTotal);
       renderWaitingRoomPlayers(waitingRoomPlayers);
 
-      if (isFirebaseConfigured && db && currentRoomCode && window.isMultiplayerHost) {
-        update(ref(db, `rooms/${currentRoomCode}`), { players: waitingRoomPlayers });
+      if (db && currentRoomCode && window.isMultiplayerHost) {
+        await update(ref(db, `rooms/${currentRoomCode}`), { players: waitingRoomPlayers, updatedAt: Date.now() });
       }
     };
 
@@ -1208,9 +1283,10 @@
       const box = document.getElementById('waitingPlayersList');
       box.innerHTML = '';
       list.forEach(p => {
+        const isMe = String(p.id) === String(localPlayerId);
         box.innerHTML += `
-          <div class="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-title font-bold flex items-center justify-between">
-            <span class="truncate ${p.isAI ? 'text-slate-300' : 'text-amber-300'}">${p.isAI ? '🤖' : '🤠'} ${p.name}</span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-slate-800 border ${isMe ? 'border-amber-400' : 'border-slate-700'} text-xs font-title font-bold flex items-center justify-between">
+            <span class="truncate ${p.isAI ? 'text-slate-300' : 'text-amber-300'}">${p.isAI ? '🤖' : '🤠'} ${p.name}${isMe ? ' (คุณ)' : ''}</span>
           </div>
         `;
       });
@@ -1219,28 +1295,28 @@
     // เริ่มเกมจากห้องรอ
     window.hostStartMultiplayerGame = function() {
       if (waitingRoomPlayers.length < 2) {
-        alert('ต้องมีผู้เล่นรวมบอทอย่างน้อย 2 คนขึ้นไป');
+        alert('ต้องมีผู้เล่นรวมบอทอย่างน้อย 2 คนขึ้นไปครับ');
         return;
       }
-      isOnlineMode = isFirebaseConfigured && db != null;
+      isOnlineMode = true;
       startGame(waitingRoomPlayers);
     };
 
-    // แชร์ลิงก์ห้องให้เพื่อน
+    // แชร์ลิงก์ชวนเพื่อน
     window.shareRoomUrl = function() {
       const url = `${window.location.origin}${window.location.pathname}?room=${currentRoomCode}`;
       if (navigator.share) {
         navigator.share({ title: 'Incan Gold Deluxe', text: `มาเล่น Incan Gold กัน! รหัสห้อง: ${currentRoomCode}`, url });
       } else {
         navigator.clipboard.writeText(url);
-        alert(`คัดลอกลิงก์ห้องแล้ว ส่งให้เพื่อนได้เลย:\n${url}`);
+        alert(`คัดลอกลิงก์ห้องแล้ว (${currentRoomCode}):\n${url}`);
       }
     };
 
-    // ซิงค์สถานะระหว่างเล่นบน Firebase
-    window.syncHostStateToFirebase = function(phase) {
-      if (!isFirebaseConfigured || !db || !currentRoomCode || !window.isMultiplayerHost) return;
-      update(ref(db, `rooms/${currentRoomCode}`), {
+    // ซิงค์สถานะของห้องจากเครื่อง Host ขึ้น Firebase
+    window.syncHostStateToFirebase = async function(phase) {
+      if (!db || !currentRoomCode || !window.isMultiplayerHost) return;
+      await update(ref(db, `rooms/${currentRoomCode}`), {
         status: 'playing',
         phase,
         currentRound,
@@ -1249,12 +1325,14 @@
         currentPathCards,
         activeHazardsOnPath,
         hazardCounts,
-        players
+        players,
+        updatedAt: Date.now()
       });
     };
 
+    // ส่งการตัดสินใจของผู้เล่นแต่ละคนขึ้น Firebase
     window.submitMultiplayerChoice = async function(choice) {
-      if (!isFirebaseConfigured || !db || !currentRoomCode) return;
+      if (!db || !currentRoomCode) return;
       const idx = players.findIndex(p => String(p.id) === String(localPlayerId));
       if (idx >= 0) {
         await update(ref(db, `rooms/${currentRoomCode}/players/${idx}`), { currentChoice: choice });
@@ -1267,8 +1345,10 @@
       window.syncHostStateToFirebase('drawing');
     };
 
+    // รับข้อมูลแบบ Real-time จากเซิร์ฟเวอร์
     function subscribeRoom(code) {
-      onValue(ref(db, `rooms/${code}`), (snap) => {
+      if (roomUnsubscribe) roomUnsubscribe();
+      roomUnsubscribe = onValue(ref(db, `rooms/${code}`), (snap) => {
         const data = snap.val();
         if (!data) return;
         const pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
@@ -1280,24 +1360,56 @@
         }
 
         if (data.status === 'playing') {
+          isOnlineMode = true;
           document.getElementById('lobbyScreen').classList.add('hidden');
           document.getElementById('gameLayout').classList.remove('hidden');
           document.getElementById('gameLayout').classList.add('flex');
 
           if (!window.isMultiplayerHost) {
+            // เครื่องผู้เล่นคนอื่น: อัปเดตกระดานตามข้อมูลจาก Host
             players = pList;
             currentRound = data.currentRound || 1;
             pathRemainder = data.pathRemainder || 0;
             activeHazardsOnPath = data.activeHazardsOnPath || [];
             hazardCounts = data.hazardCounts || hazardCounts;
+
+            // อัปเดตการ์ดบนเส้นทางหากมีใบใหม่เปิดเพิ่ม
+            const serverCards = data.currentPathCards || [];
+            if (serverCards.length === 0) {
+              document.getElementById('cardsScroll').innerHTML = '';
+              currentPathCards = [];
+            } else if (serverCards.length > currentPathCards.length) {
+              for (let i = currentPathCards.length; i < serverCards.length; i++) {
+                currentPathCards.push(serverCards[i]);
+                playSFX('flip');
+                renderCard(serverCards[i], i);
+              }
+            }
+
             updateUI();
             updateDeckTracker();
+
+            const me = players.find(p => String(p.id) === String(localPlayerId));
+            if (data.phase === 'round_ended') {
+              setButtonsEnabled(false);
+              document.getElementById('statusNotice').innerText = `จบรอบที่ ${currentRound} รอหัวหน้าห้องกดเริ่มรอบถัดไป...`;
+            } else if (me && me.inTemple && !me.currentChoice) {
+              isProcessing = false;
+              setButtonsEnabled(true);
+              document.getElementById('statusNotice').innerText = "ตาคุณตัดสินใจ: ลุยต่อ หรือ กลับเต็นท์?";
+            } else if (me && !me.inTemple) {
+              setButtonsEnabled(false);
+              document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว รอคนอื่นสำรวจ...";
+            }
           } else {
-            // เครื่อง Host เช็กว่าผู้เล่นคนจริงทุกคนกดเลือกครบหรือยัง
+            // เครื่องหัวหน้าห้อง (Host): เช็กว่าผู้เล่นคนจริงทุกคนที่อยู่ในวิหารเลือกครบหรือยัง
             players = pList;
             const activeHumans = players.filter(p => p.inTemple && !p.isAI);
             const allChosen = activeHumans.every(p => p.currentChoice === 'explore' || p.currentChoice === 'return');
-            if (activeHumans.length > 0 && allChosen) {
+
+            const turnKey = `${currentRound}_${currentPathCards.length}`;
+            if (activeHumans.length > 0 && allChosen && lastProcessedTurnKey !== turnKey) {
+              lastProcessedTurnKey = turnKey;
               const decisions = {};
               players.forEach(p => {
                 if (!p.inTemple) return;
