@@ -1,28 +1,16 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-
   <!-- ================= PWA & App Icon Settings ================= -->
-  <!-- ชื่อแอปเวลาอยู่บนหน้าจอโฮม -->
   <meta name="apple-mobile-web-app-title" content="Incan Gold">
   <meta name="application-name" content="Incan Gold">
-  
-  <!-- บังคับให้เปิดแอปแบบเต็มจอ (Standalone) ไม่มีแถบ URL บน-ล่าง -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  
-  <!-- ตั้งค่าสีแถบสถานะ (Status Bar) ด้านบนสุดของมือถือ -->
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
-
-  <!-- ไอคอนสำหรับ iOS (Apple Touch Icon) -->
   <link rel="apple-touch-icon" href="https://res.cloudinary.com/dh6wsulnr/image/upload/v1792740741/IMG_3858_ldjoot.png">
-  
-  <!-- ไอคอนสำหรับ Android และเบราว์เซอร์อื่นๆ -->
   <link rel="icon" type="image/png" sizes="192x192" href="https://res.cloudinary.com/dh6wsulnr/image/upload/v1792740741/IMG_3858_ldjoot.png">
   <link rel="icon" type="image/png" sizes="512x512" href="https://res.cloudinary.com/dh6wsulnr/image/upload/v1792740741/IMG_3858_ldjoot.png">
-
-  <!-- ลิงก์ไปยังไฟล์ manifest.json (ต้องสร้างไฟล์นี้เพิ่มในข้อ 3) -->
   <link rel="manifest" href="manifest.json">
 
   <meta charset="UTF-8">
@@ -63,14 +51,12 @@
       --icon-rock: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792683674/IMG_3836_tqnxie.png');
       --icon-mummy: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792683675/IMG_3837_obydym.png');
 
-      /* ================= ภาพการ์ดวิหาร: สี (กำลังเล่น / ผ่านไปแล้ว) ================= */
+      /* ================= ภาพการ์ดวิหาร ================= */
       --img-round-1-color: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792577892/Round1_zujevj.png');
       --img-round-2-color: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792577888/Round2_kanmhs.png');
       --img-round-3-color: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792577886/Round3_svjdcy.png');
       --img-round-4-color: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792577883/Round4_uamafl.png');
       --img-round-5-color: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792577881/Round5_ec2tz6.png');
-
-      /* ================= ภาพการ์ดวิหาร: ขาวดำ (ยังไปไม่ถึง) ================= */
       --img-round-1-bw: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792659099/RoundB1_y8y6ll.png');
       --img-round-2-bw: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792659098/RoundB2_sxuuft.png');
       --img-round-3-bw: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792659101/RoundB3_ancpi4.png');
@@ -90,13 +76,11 @@
       --img-treasure-14: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-14_cfqfp1.jpg');
       --img-treasure-15: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-15_mvlfwh.jpg');
       --img-treasure-17: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-17_sgwswt.jpg');
-
       --img-artifact-1: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647330/Img-artifact-1_dh4jl0.jpg');
       --img-artifact-2: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-2_bkypdf.jpg');
       --img-artifact-3: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-3_fg0khl.jpg');
       --img-artifact-4: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-4_ze1crw.jpg');
       --img-artifact-5: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-5_x8yefg.jpg');
-
       --img-hazard-spider: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-spider_hnn4q9.jpg');
       --img-hazard-snake: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-snake_a3jqn6.jpg');
       --img-hazard-fire: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/img-hazard-fire_u2j4qh.jpg');
@@ -352,7 +336,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </button>
           <button onclick="openModal('modalRules')" class="top-btn text-sky-400 font-title font-bold text-lg" title="วิธีเล่น">?</button>
-          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/กลับหน้าแรก">🏠</button>
+          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ออกจากเกม">🏠</button>
         </div>
       </div>
     </header>
@@ -408,6 +392,9 @@
               <span class="font-title font-bold text-base md:text-lg text-white tracking-wide drop-shadow-md">กลับเต็นท์</span>
             </button>
           </div>
+          <button id="nextRoundBtn" class="hidden w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-700 text-slate-950 font-title font-bold text-lg rounded-xl shadow-lg border border-amber-300 active:scale-95 transition-transform mt-2">
+            เข้าสู่วิหารรอบถัดไป ➡️
+          </button>
         </div>
       </div>
 
@@ -440,7 +427,7 @@
           <span class="text-xl">📜</span>
           <div>
             <h3 class="text-sm font-title font-bold text-amber-300 leading-tight">JOURNEY LOG</h3>
-            <p class="text-[10px] text-slate-300">บันทึกการเดินทางรอบปัจจุบัน (รีเซ็ตทุกรอบ)</p>
+            <p class="text-[10px] text-slate-300">บันทึกการเดินทาง (ซิงค์ตรงกันทุกคน)</p>
           </div>
         </div>
         <button onclick="closeModal('modalLog')" class="w-7 h-7 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 flex items-center justify-center text-xs font-bold">✖</button>
@@ -564,6 +551,8 @@
     let isProcessing = false;
     let isOnlineMode = false;
     let localPlayerId = 0;
+    window.multiplayerLogs = [];
+    window.localCollapseAlerted = false;
     
     /* --- Timer Logic --- */
     let decisionTimer = null;
@@ -617,6 +606,14 @@
     document.getElementById('btnStartGame').addEventListener('click', () => { initAudio(); startGame(); });
     document.getElementById('exploreBtn').addEventListener('click', () => { initAudio(); handleChoice('explore'); });
     document.getElementById('returnBtn').addEventListener('click', () => { initAudio(); handleChoice('return'); });
+    document.getElementById('nextRoundBtn').addEventListener('click', () => {
+      if (isOnlineMode && window.isMultiplayerHost) {
+        window.hostNextRoundMultiplayer();
+      } else {
+        currentRound++;
+        startNewRound();
+      }
+    });
 
     /* --- Forfeit / Exit --- */
     window.forfeitGame = async function() {
@@ -657,6 +654,7 @@
       
       hazardCounts = { spider: 3, snake: 3, fire: 3, rock: 3, mummy: 3 };
       activeArtifactsPool = [];
+      window.multiplayerLogs = [];
       document.getElementById('lobbyScreen').classList.add('hidden');
       document.getElementById('gameLayout').classList.remove('hidden');
       document.getElementById('gameLayout').classList.add('flex');
@@ -687,9 +685,11 @@
 
     function startNewRound() {
       isProcessing = false; currentPathCards = []; activeHazardsOnPath = []; pathRemainder = 0;
+      window.localCollapseAlerted = false;
       players.forEach(p => { if(!p.hasForfeited) { p.inTemple = true; p.bag = 0; p.currentChoice = null; }});
 
-      document.getElementById('logBox').innerHTML = ''; // Reset Log Auto
+      window.multiplayerLogs = [];
+      document.getElementById('logBox').innerHTML = '';
       document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
 
       for(let i=1; i<=5; i++) {
@@ -714,7 +714,6 @@
       updateUI(); updateDeckTracker();
       log(`<span class="text-amber-400 font-bold text-sm">⛩️ เริ่มสำรวจวิหารที่ ${currentRound}/5</span>`);
 
-      // ในโหมดเล่นคนเดียวให้จั่วไพ่ใบแรกอัตโนมัติเลยโดยไม่ต้องรอ Host
       if (!isOnlineMode || window.isMultiplayerHost) {
         setTimeout(drawCard, 600);
       }
@@ -747,7 +746,6 @@
     function renderCard(card, idx) {
       const sc = document.getElementById('cardsScroll');
       const w = document.createElement('div');
-      // ขนาดการ์ดลดลงเล็กน้อยให้พอดีกรอบ
       w.className = 'card-scene shrink-0 w-[84px] h-[126px] md:w-[98px] md:h-[147px] relative transition-opacity duration-500'; 
       w.id = `cWrap-${idx}`;
 
@@ -839,7 +837,7 @@
         setButtonsEnabled(false);
         if (!isOnlineMode || window.isMultiplayerHost) {
           // ถ้าไม่มีคนจริงเหลือ ให้รันบอทอัตโนมัติเลยโดยไม่ค้างรอ
-          setTimeout(() => runBotOnlyTurn(), 500);
+          setTimeout(() => runBotOnlyTurn(), 400);
         }
       } 
       else { 
@@ -923,12 +921,17 @@
 
       players.forEach(p => p.currentChoice = null);
       updateUI();
+      
+      // Sync resolving state right away to prevent race conditions in MP
+      if (isOnlineMode && window.isMultiplayerHost) {
+          window.syncHostStateToFirebase('resolving');
+      }
 
       if(continuers.length === 0) { 
         if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
         setTimeout(endRound, 800); 
       } else { 
-        setTimeout(drawCard, 400); // Faster draw
+        setTimeout(drawCard, 350); // Faster draw
       } 
     }
 
@@ -976,7 +979,7 @@
       isProcessing = true;
       stopDecisionTimer();
       setButtonsEnabled(false);
-      document.getElementById('statusNotice').innerText = `สิ้นสุดการสำรวจวิหารที่ ${currentRound}`;
+      document.getElementById('statusNotice').innerText = `สิ้นสุดวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
       currentPathCards.forEach(c => {
@@ -996,7 +999,7 @@
       } else {
         // ออโต้ไปรอบถัดไปสำหรับเล่นคนเดียว
         if (!isOnlineMode) {
-          setTimeout(() => { currentRound++; startNewRound(); }, 2500);
+          setTimeout(() => { currentRound++; startNewRound(); }, 2000);
         } else if (window.isMultiplayerHost) {
           // แจ้งเตือน Host ให้ออกคำสั่งไปรอบถัดไป
           document.getElementById('nextRoundBtn').style.display = 'block';
@@ -1098,10 +1101,16 @@
     function log(msg) {
       const box = document.getElementById('logBox');
       const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const logHtml = `<span class="text-[10px] text-slate-400 font-mono mr-1">[${time}]</span> <span class="text-[11px] md:text-xs">${msg}</span>`;
       const d = document.createElement('div'); 
       d.className = 'bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed'; 
-      d.innerHTML = `<span class="text-[10px] text-slate-400 font-mono mr-1">[${time}]</span> <span class="text-[11px] md:text-xs">${msg}</span>`;
+      d.innerHTML = logHtml;
       box.prepend(d);
+
+      if (!isOnlineMode || window.isMultiplayerHost) {
+        window.multiplayerLogs.unshift(logHtml);
+        if(window.multiplayerLogs.length > 40) window.multiplayerLogs.pop();
+      }
     }
   </script>
 
@@ -1114,14 +1123,15 @@
        📌 วางค่า firebaseConfig
        ========================================================================= */
     const firebaseConfig = {
- 	 apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
-  	authDomain: "incan-gold-deluxe.firebaseapp.com",
-  	databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  	projectId: "incan-gold-deluxe",
-  	storageBucket: "incan-gold-deluxe.firebasestorage.app",
-  	messagingSenderId: "1034905115077",
-  	appId: "1:1034905115077:web:ead1c2f72f305c3397d3ac",
-  	measurementId: "G-RG4JJLMFXL"};
+ 	    apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
+  	  authDomain: "incan-gold-deluxe.firebaseapp.com",
+  	  databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  	  projectId: "incan-gold-deluxe",
+  	  storageBucket: "incan-gold-deluxe.firebasestorage.app",
+  	  messagingSenderId: "1034905115077",
+  	  appId: "1:1034905115077:web:ead1c2f72f305c3397d3ac",
+  	  measurementId: "G-RG4JJLMFXL"
+    };
 
     const statusEl = document.getElementById('firebaseStatusText');
     window.db = null;
@@ -1254,7 +1264,10 @@
 
     window.syncHostStateToFirebase = async function(phase) {
       if (!window.db || !currentRoomCode || !window.isMultiplayerHost) return;
-      await update(ref(window.db, `rooms/${currentRoomCode}`), { status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, currentPathCards, activeHazardsOnPath, hazardCounts, players, updatedAt: Date.now() });
+      await update(ref(window.db, `rooms/${currentRoomCode}`), { 
+        status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, 
+        currentPathCards, activeHazardsOnPath, hazardCounts, players, logs: window.multiplayerLogs, updatedAt: Date.now() 
+      });
     };
 
     window.submitMultiplayerChoice = async function(choice) {
@@ -1285,9 +1298,16 @@
           document.getElementById('gameLayout').classList.add('flex');
 
           if (!window.isMultiplayerHost) {
-            // Client Update
+            // ================= CLIENT UPDATE =================
             players = pList; currentRound = data.currentRound || 1; pathRemainder = data.pathRemainder || 0;
             activeHazardsOnPath = data.activeHazardsOnPath || []; hazardCounts = data.hazardCounts || hazardCounts;
+
+            // Sync Log
+            if (data.logs && data.logs.length > 0) {
+              document.getElementById('logBox').innerHTML = data.logs.map(html => `<div class="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed">${html}</div>`).join('');
+            } else {
+              document.getElementById('logBox').innerHTML = '';
+            }
 
             const sc = data.currentPathCards || [];
             if (sc.length === 0) { document.getElementById('cardsScroll').innerHTML = ''; currentPathCards = []; } 
@@ -1296,7 +1316,7 @@
                 currentPathCards.push(sc[i]); playSFX('flip'); renderCard(sc[i], i);
               }
             } else {
-               // Update claimed status visuals
+               // Update claimed status visuals locally
                sc.forEach((c, i) => { if(c.claimed) { const w = document.getElementById(`cWrap-${i}`); if(w) w.classList.add('claimed'); } });
             }
 
@@ -1313,16 +1333,6 @@
             updateUI(); updateDeckTracker();
 
             const me = players.find(p => String(p.id) === String(localPlayerId));
-            
-            // Screen shake sync
-            if(data.phase === 'round_ended' && sc.length > 0 && sc[sc.length-1].type === 'hazard') {
-               const lastC = sc[sc.length-1];
-               if(activeHazardsOnPath.includes(lastC.hType)) {
-                 playSFX('collapse');
-                 document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
-                 setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
-               }
-            }
 
             if (data.phase === 'game_ended') {
                showFinalScore();
@@ -1330,14 +1340,25 @@
               stopDecisionTimer(); setButtonsEnabled(false);
               document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องเริ่มวิหารที่ ${currentRound + 1}...`;
               document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
-            } else if (me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
-              isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
-            } else if (me && (!me.inTemple || me.hasForfeited)) {
-              stopDecisionTimer(); setButtonsEnabled(false);
-              document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
+              
+              // Trigger client shake exactly once per round end
+              if (!window.localCollapseAlerted && sc.length > 0 && sc[sc.length-1].type === 'hazard' && activeHazardsOnPath.includes(sc[sc.length-1].hType)) {
+                 window.localCollapseAlerted = true;
+                 playSFX('collapse');
+                 document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
+                 setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
+              }
+            } else {
+              window.localCollapseAlerted = false; // Reset for next rounds
+              if (me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
+                isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
+              } else if (me && (!me.inTemple || me.hasForfeited)) {
+                stopDecisionTimer(); setButtonsEnabled(false);
+                document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
+              }
             }
           } else {
-            // Host logic checks
+            // ================= HOST LOGIC =================
             players = pList;
             const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
             const allChosen = activeHumans.every(p => p.currentChoice === 'explore' || p.currentChoice === 'return');
@@ -1352,9 +1373,10 @@
               players.forEach(p => { if (!p.inTemple || p.hasForfeited) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
               processDecisions(decisions);
             } else if (activeHumans.length === 0 && players.some(p => p.inTemple && p.isAI && !p.hasForfeited) && lastProcessedTurnKey !== turnKey) {
+              // No humans left, let bots finish the run instantly
               lastProcessedTurnKey = turnKey;
               stopDecisionTimer();
-              setTimeout(() => runBotOnlyTurn(), 500);
+              setTimeout(() => runBotOnlyTurn(), 400);
             }
           }
         }
