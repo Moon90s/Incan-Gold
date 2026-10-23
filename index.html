@@ -76,11 +76,13 @@
       --img-treasure-14: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-14_cfqfp1.jpg');
       --img-treasure-15: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-15_mvlfwh.jpg');
       --img-treasure-17: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-17_sgwswt.jpg');
+
       --img-artifact-1: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647330/Img-artifact-1_dh4jl0.jpg');
       --img-artifact-2: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-2_bkypdf.jpg');
       --img-artifact-3: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-3_fg0khl.jpg');
       --img-artifact-4: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-4_ze1crw.jpg');
       --img-artifact-5: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-5_x8yefg.jpg');
+
       --img-hazard-spider: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-spider_hnn4q9.jpg');
       --img-hazard-snake: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-snake_a3jqn6.jpg');
       --img-hazard-fire: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/img-hazard-fire_u2j4qh.jpg');
@@ -150,15 +152,17 @@
     .custom-frame-me { background-image: var(--frame-player); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.55)); }
     .custom-frame-camped { background-image: var(--frame-player-camped); opacity: 0.85; filter: grayscale(15%); }
 
+    /* Forfeited / Offline Style */
+    .custom-frame-forfeited { background-image: var(--frame-player-camped); opacity: 0.4; filter: grayscale(100%); }
     .text-strong-shadow { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85); }
 
-    /* Temple Round Cards - 100% Fit */
+    /* Temple Round Cards */
     .temple-card { background-size: 100% 100%; background-repeat: no-repeat; background-position: center; transition: all 0.3s ease; border: 2px solid transparent; }
     .temple-current { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.6); transform: scale(1.05); z-index: 10; filter: brightness(1.1); }
     .temple-past { border-color: #475569; opacity: 0.85; }
     .temple-unexplored { border-color: #334155; opacity: 0.8; }
 
-    /* 3D Card Flip (ปรับขนาด 35%) */
+    /* 3D Card Flip */
     .card-scene { perspective: 1200px; }
     .card-object { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s ease-out; transform: rotateY(180deg); }
     .card-object.flipped { transform: rotateY(0deg); }
@@ -168,7 +172,6 @@
     .card-face-front.hazard-card { border-color: #ef4444; }
     .card-face-front.artifact-card { border-color: #38bdf8; }
     
-    /* สไตล์เมื่อ Artifact โดนเก็บไปแล้วจะจางลง แทนที่จะคว่ำหน้า */
     .card-scene.claimed { opacity: 0.35; transition: opacity 0.5s ease; filter: grayscale(50%); }
 
     .card-leftover { position: absolute; top: -8px; right: -8px; background: #f59e0b; color: #000; font-family: var(--font-title); font-size: 0.9rem; font-weight: 800; padding: 1px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.85); z-index: 20; border: 2px solid #fff; }
@@ -301,7 +304,6 @@
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
-        <!-- กองการ์ด & วัตถุโบราณ -->
         <div class="flex items-center gap-3 text-sm bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/70">
           <span class="flex items-center gap-1.5 text-amber-400 font-title font-bold">
             <i class="hz-ico w-6 h-6 drop-shadow" style="background-image:var(--icon-deck)"></i>
@@ -313,7 +315,6 @@
           </span>
         </div>
 
-        <!-- จำนวนการ์ดกับดัก -->
         <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/70 text-xs font-mono font-bold text-slate-200">
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-spider)"></i><span id="hz-spider">3</span></span>
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-snake)"></i><span id="hz-snake">3</span></span>
@@ -322,7 +323,6 @@
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-mummy)"></i><span id="hz-mummy">3</span></span>
         </div>
 
-        <!-- ปุ่มลัด -->
         <div class="flex items-center gap-1.5 ml-auto sm:ml-0">
           <button onclick="toggleAudio()" class="top-btn text-amber-400" title="เสียง">
             <svg id="soundIconOn" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
@@ -336,13 +336,12 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </button>
           <button onclick="openModal('modalRules')" class="top-btn text-sky-400 font-title font-bold text-lg" title="วิธีเล่น">?</button>
-          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/กลับหน้าแรก">🏠</button>
+          <button onclick="requestForfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/ออกจากห้อง">🏠</button>
         </div>
       </div>
     </header>
 
     <div id="mainContainerWrapper" class="flex flex-col gap-2.5 z-10 w-full relative">
-      <!-- 1. เส้นทางวิหาร -->
       <div class="flex flex-col gap-1 shrink-0">
         <div class="flex items-center justify-between px-2">
           <div class="font-title font-bold text-amber-400 text-sm tracking-wide flex items-center gap-2 drop-shadow">
@@ -355,15 +354,11 @@
         </div>
 
         <div class="custom-panel-stone rounded-xl flex items-center shadow-xl relative overflow-hidden">
-          <div id="cardsScroll" class="flex gap-2.5 overflow-x-auto py-1 px-1 items-center w-full scroll-smooth">
-            <!-- Cards injected here -->
-          </div>
+          <div id="cardsScroll" class="flex gap-2.5 overflow-x-auto py-1 px-1 items-center w-full scroll-smooth"></div>
         </div>
       </div>
 
-      <!-- 2. ทีมนักสำรวจ + ปุ่มตัดสินใจ (ชิดกล่องหิน) -->
       <div class="flex flex-col gap-2.5 shrink-0 w-full relative z-20">
-        
         <div class="bg-slate-900/75 rounded-xl p-2.5 border border-slate-800 shadow-inner">
           <div class="flex items-center justify-between mb-2 px-1">
             <div class="text-xs font-title font-bold text-slate-300 flex items-center gap-1.5">
@@ -374,9 +369,7 @@
                <div class="timer-bar-container"><div id="timerFill" class="timer-bar-fill"></div></div>
             </div>
           </div>
-          <div id="playersGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <!-- Player frames here -->
-          </div>
+          <div id="playersGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
         </div>
 
         <div id="controlsArea">
@@ -469,7 +462,7 @@
   </div>
 
   <script>
-    /* --- Modal, UI Toggle & Sound Logic --- */
+    /* --- Modal & Utilities --- */
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -480,24 +473,6 @@
       document.getElementById('multiModePanel').classList.toggle('flex', !isSingle);
       document.getElementById('tabSingleBtn').className = isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
       document.getElementById('tabMultiBtn').className = !isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
-    }
-
-    function toggleActionUI(mode) {
-      const dec = document.getElementById('decisionControls');
-      const nxt = document.getElementById('nextRoundBtn');
-      if (mode === 'decision') {
-        dec.classList.remove('hidden');
-        dec.classList.add('grid');
-        nxt.classList.add('hidden');
-      } else if (mode === 'nextRound') {
-        dec.classList.add('hidden');
-        dec.classList.remove('grid');
-        nxt.classList.remove('hidden');
-      } else if (mode === 'hideAll') {
-        dec.classList.add('hidden');
-        dec.classList.remove('grid');
-        nxt.classList.add('hidden');
-      }
     }
 
     let audioCtx = null;
@@ -569,19 +544,18 @@
     let localPlayerId = 0;
     window.multiplayerLogs = [];
     window.localCollapseAlerted = false;
+    window.db = null;
+    let currentRoomCode = null;
+    let roomUnsubscribe = null;
+    let userStatusRef = null;
     
-    /* --- Timeout Management --- */
-    const gameTimeouts = { draw: null, bot: null, end: null };
-
     /* --- Timer Logic --- */
     let decisionTimer = null;
     let timeLeft = 15;
-    let isTimeUp = false;
 
     function startDecisionTimer() {
       clearInterval(decisionTimer);
       timeLeft = 15;
-      isTimeUp = false;
       const tc = document.getElementById('timerContainer');
       const tf = document.getElementById('timerFill');
       const notice = document.getElementById('statusNotice');
@@ -600,12 +574,11 @@
 
         if(timeLeft <= 0) {
           clearInterval(decisionTimer);
-          isTimeUp = true;
           notice.innerText = "หมดเวลา! บังคับกลับเต็นท์";
           notice.classList.remove('animate-pulse');
           notice.classList.add('text-rose-400');
           const me = players.find(p => String(p.id) === String(localPlayerId));
-          if(me && me.inTemple && !me.currentChoice) {
+          if(me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
             handleChoice('return'); 
           }
         } else {
@@ -626,7 +599,7 @@
     document.getElementById('exploreBtn').addEventListener('click', () => { initAudio(); handleChoice('explore'); });
     document.getElementById('returnBtn').addEventListener('click', () => { initAudio(); handleChoice('return'); });
     document.getElementById('nextRoundBtn').addEventListener('click', (e) => {
-      e.currentTarget.classList.add('hidden'); // ซ่อนปุ่มทันทีเพื่อป้องกันการกดเบิ้ล
+      e.currentTarget.classList.add('hidden');
       if (isOnlineMode && window.isMultiplayerHost) {
         window.hostNextRoundMultiplayer();
       } else {
@@ -636,20 +609,23 @@
     });
 
     /* --- Forfeit / Exit --- */
-    window.forfeitGame = async function() {
-      if(!confirm("คุณต้องการออกจากเกมหรือไม่?\n(คุณจะถูกปรับแพ้และตัดออกจากรอบนี้ทันที)")) return;
+    window.requestForfeitGame = async function() {
+      if(!confirm("คุณต้องการออกจากเกมหรือไม่?\n(เพชรในรอบนี้จะเป็น 0 และจะถูกตัดออกจากการเล่น)")) return;
       
-      const meIdx = players.findIndex(p => String(p.id) === String(localPlayerId));
-      if(isOnlineMode && window.db && currentRoomCode && meIdx >= 0) {
-        import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(async ({ref, update}) => {
-          await update(ref(window.db, `rooms/${currentRoomCode}/players/${meIdx}`), {
-            inTemple: false, bag: 0, chest: 0, currentChoice: 'return', hasForfeited: true
-          });
-          location.reload();
-        });
-      } else {
-        location.reload();
+      if(isOnlineMode && window.db && currentRoomCode) {
+        const meIdx = players.findIndex(p => String(p.id) === String(localPlayerId));
+        if(meIdx >= 0) {
+           import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(async ({ref, update}) => {
+              // มาร์คสถานะตัวเองเป็นออกเกม ให้ Host ประมวลผลต่อได้ทันที
+              await update(ref(window.db, `rooms/${currentRoomCode}/players/${meIdx}`), {
+                inTemple: false, bag: 0, chest: 0, currentChoice: 'return', hasForfeited: true, isOffline: true
+              });
+              location.reload();
+           });
+           return;
+        }
       }
+      location.reload();
     }
 
     /* --- Core Logic --- */
@@ -661,13 +637,13 @@
         localPlayerId = 0;
         const pName = document.getElementById('playerNameInput').value || 'อินดี้';
         const botCount = parseInt(document.getElementById('botCountInput').value);
-        players = [{ id: 0, name: pName, isAI: false, inTemple: true, bag: 0, chest: 0, profile: null, bustCount: 0, riskMod: 0, hasForfeited: false }];
+        players = [{ id: 0, name: pName, isAI: false, inTemple: true, bag: 0, chest: 0, profile: null, bustCount: 0, riskMod: 0, hasForfeited: false, isOffline: false }];
         
         let bots = [...BOT_PROFILES].sort(() => 0.5 - Math.random());
         for(let i=0; i<botCount; i++) {
           players.push({
             id: i+1, name: bots[i].n, isAI: true, inTemple: true, bag: 0, chest: 0,
-            profile: bots[i].p, riskBase: bots[i].riskBase, bustCount: 0, riskMod: (Math.random() * 0.06) - 0.03, hasForfeited: false
+            profile: bots[i].p, riskBase: bots[i].riskBase, bustCount: 0, riskMod: (Math.random() * 0.06) - 0.03, hasForfeited: false, isOffline: false
           });
         }
       }
@@ -706,12 +682,17 @@
     function startNewRound() {
       isProcessing = false; currentPathCards = []; activeHazardsOnPath = []; pathRemainder = 0;
       window.localCollapseAlerted = false;
-      Object.values(gameTimeouts).forEach(clearTimeout);
 
-      players.forEach(p => { if(!p.hasForfeited) { p.inTemple = true; p.bag = 0; p.currentChoice = null; }});
+      players.forEach(p => { 
+        if(!p.hasForfeited && !p.isOffline) { 
+          p.inTemple = true; p.bag = 0; p.currentChoice = null; 
+        } else {
+          p.inTemple = false; p.bag = 0; p.currentChoice = 'return';
+        }
+      });
 
       window.multiplayerLogs = [];
-      document.getElementById('logBox').innerHTML = '';
+      document.getElementById('logBox').innerHTML = ''; 
       document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
 
       for(let i=1; i<=5; i++) {
@@ -731,14 +712,14 @@
       deck.sort(() => 0.5 - Math.random());
 
       document.getElementById('cardsScroll').innerHTML = ''; 
+      document.getElementById('nextRoundBtn').classList.add('hidden');
       
-      toggleActionUI('decision');
       setButtonsEnabled(false);
       updateUI(); updateDeckTracker();
       log(`<span class="text-amber-400 font-bold text-sm">⛩️ เริ่มสำรวจวิหารที่ ${currentRound}/5</span>`);
 
       if (!isOnlineMode || window.isMultiplayerHost) {
-        gameTimeouts.draw = setTimeout(drawCard, 600);
+        setTimeout(drawCard, 600);
       }
     }
 
@@ -804,7 +785,7 @@
     }
 
     function processCard(card, idx) {
-      const inTemple = players.filter(p => p.inTemple && !p.hasForfeited);
+      const inTemple = players.filter(p => p.inTemple && !p.hasForfeited && !p.isOffline);
 
       if (card.type === 'treasure') {
         const share = Math.floor(card.value / inTemple.length);
@@ -832,9 +813,7 @@
           
           updateUI(); updateDeckTracker();
           if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-          
-          clearTimeout(gameTimeouts.end);
-          gameTimeouts.end = setTimeout(endRound, 1000); 
+          setTimeout(endRound, 1000); 
           return;
         } else {
           activeHazardsOnPath.push(card.hType);
@@ -852,21 +831,20 @@
         window.syncHostStateToFirebase('decision');
       }
 
-      const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
+      const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited && !p.isOffline);
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
 
       if(activeHumans.length === 0) { 
         document.getElementById('statusNotice').innerText = "บอทกำลังสำรวจต่อ...";
         document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
         setButtonsEnabled(false);
-        if (!isOnlineMode) {
-          clearTimeout(gameTimeouts.bot);
-          gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
+        if (!isOnlineMode || window.isMultiplayerHost) {
+          setTimeout(() => runBotOnlyTurn(), 500);
         }
       } 
       else { 
         isProcessing = false; 
-        if(me.inTemple && !me.hasForfeited) {
+        if(me.inTemple && !me.hasForfeited && !me.isOffline) {
           setButtonsEnabled(true); 
           startDecisionTimer(); 
         } else {
@@ -879,7 +857,7 @@
 
     function handleChoice(humanAction) {
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
-      if(isProcessing || !me.inTemple || me.hasForfeited) return;
+      if(isProcessing || !me.inTemple || me.hasForfeited || me.isOffline) return;
       isProcessing = true; 
       stopDecisionTimer();
       setButtonsEnabled(false);
@@ -893,14 +871,14 @@
 
       const decisions = {};
       players.forEach(p => {
-        if(!p.inTemple || p.hasForfeited) return;
+        if(!p.inTemple || p.hasForfeited || p.isOffline) return;
         decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : humanAction;
       });
       processDecisions(decisions);
     }
 
     function runBotOnlyTurn() {
-      const activeBots = players.filter(p => p.inTemple && p.isAI);
+      const activeBots = players.filter(p => p.inTemple && p.isAI && !p.hasForfeited && !p.isOffline);
       if(activeBots.length === 0) { endRound(); return; }
       const decisions = {};
       activeBots.forEach(p => { decisions[p.id] = calcSmartBotDecision(p); });
@@ -908,8 +886,8 @@
     }
     
     function processDecisions(decisions) {
-      const returners = players.filter(p => p.inTemple && decisions[p.id] === 'return' && !p.hasForfeited);
-      const continuers = players.filter(p => p.inTemple && decisions[p.id] === 'explore' && !p.hasForfeited);
+      const returners = players.filter(p => p.inTemple && decisions[p.id] === 'return' && !p.hasForfeited && !p.isOffline);
+      const continuers = players.filter(p => p.inTemple && decisions[p.id] === 'explore' && !p.hasForfeited && !p.isOffline);
 
       if (returners.length > 0) {
         const sRem = Math.floor(pathRemainder / returners.length);
@@ -952,11 +930,9 @@
 
       if(continuers.length === 0) { 
         if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-        clearTimeout(gameTimeouts.end);
-        gameTimeouts.end = setTimeout(endRound, 800); 
+        setTimeout(endRound, 800); 
       } else { 
-        clearTimeout(gameTimeouts.draw);
-        gameTimeouts.draw = setTimeout(drawCard, 350); 
+        setTimeout(drawCard, 400); 
       } 
     }
 
@@ -964,7 +940,7 @@
       const hzCount = activeHazardsOnPath.length;
       if (hzCount === 0) return 'explore';
 
-      const inTempleCount = players.filter(x => x.inTemple && !x.hasForfeited).length;
+      const inTempleCount = players.filter(x => x.inTemple && !x.hasForfeited && !x.isOffline).length;
       const unclaimedArts = currentPathCards.filter(c => c.type === 'artifact' && !c.claimed);
       const artValueOnPath = unclaimedArts.reduce((sum, a) => sum + a.val, 0);
 
@@ -1004,8 +980,7 @@
       isProcessing = true;
       stopDecisionTimer();
       setButtonsEnabled(false);
-      toggleActionUI('hideAll'); 
-      document.getElementById('statusNotice').innerText = `สิ้นสุดวิหารที่ ${currentRound}`;
+      document.getElementById('statusNotice').innerText = `สิ้นสุดการสำรวจวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
       currentPathCards.forEach(c => {
@@ -1026,17 +1001,15 @@
         if (!isOnlineMode) {
           setTimeout(() => { currentRound++; startNewRound(); }, 2000);
         } else if (window.isMultiplayerHost) {
-          setTimeout(() => {
-             toggleActionUI('nextRound');
-             document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องกดไปรอบถัดไป...`;
-          }, 1000);
+          // แจ้งเตือน Host ให้ออกคำสั่งไปรอบถัดไป
+          document.getElementById('nextRoundBtn').style.display = 'block';
         }
       }
     }
 
     function showFinalScore() {
       updateUI(true); 
-      const s = [...players].filter(p => !p.hasForfeited).sort((a,b) => b.chest - a.chest);
+      const s = [...players].filter(p => !p.hasForfeited && !p.isOffline).sort((a,b) => b.chest - a.chest);
       const rList = document.getElementById('rankList'); rList.innerHTML = '';
       s.forEach((p, i) => {
         const el = document.createElement('div');
@@ -1052,27 +1025,37 @@
       document.getElementById('pathRemainder').innerText = pathRemainder;
       const pg = document.getElementById('playersGrid'); pg.innerHTML = '';
       players.forEach(p => {
-        if (p.hasForfeited) return; 
         const c = document.createElement('div');
         const isMe = String(p.id) === String(localPlayerId);
-        const frameClass = p.inTemple
-          ? (isMe ? 'custom-frame-me' : 'custom-frame-active')
-          : 'custom-frame-camped';
+        
+        // จัดการสถานะการ์ดผู้เล่น
+        let frameClass = 'custom-frame-active';
+        let statusBadge = '';
+        let opacityClass = '';
 
-        c.className = `player-frame-box rounded-xl ${frameClass}`;
+        if (p.hasForfeited || p.isOffline) {
+           frameClass = 'custom-frame-forfeited';
+           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] font-bold font-title bg-rose-950/90 text-rose-400 border border-rose-500/50">ออกเกม</span>`;
+           opacityClass = 'opacity-50';
+        } else if (!p.inTemple) {
+           frameClass = 'custom-frame-camped';
+           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-sky-950/90 text-sky-300 border border-sky-500/50 shadow">กลับ</span>`;
+        } else {
+           if(isMe) frameClass = 'custom-frame-me';
+           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow">ลุย</span>`;
+        }
+
+        c.className = `player-frame-box rounded-xl ${frameClass} ${opacityClass}`;
         c.id = `player-${p.id}`; 
         
         const tStr = (isMe || revealTents) ? p.chest : '?';
-        const stB = p.inTemple
-          ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow">ลุย</span>`
-          : `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-sky-950/90 text-sky-300 border border-sky-500/50 shadow">กลับ</span>`;
         
         c.innerHTML = `
           <div class="flex justify-between items-center gap-1 px-1">
             <span class="font-title font-bold text-xs sm:text-sm truncate ${isMe ? 'text-amber-200' : 'text-white'} text-strong-shadow">
               ${p.name.split(' ')[0]}${isMe ? ' (คุณ)' : ''}
             </span>
-            ${stB}
+            ${statusBadge}
           </div>
           <div class="flex justify-between items-center bg-black/55 px-2.5 py-1 rounded-lg border border-white/10">
             <div class="flex items-center gap-1.5">
@@ -1144,7 +1127,7 @@
   <!-- ================= ระบบหลังบ้าน FIREBASE MULTIPLAYER ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, set, get, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     /* =========================================================================
        📌 วางค่า firebaseConfig
@@ -1192,6 +1175,22 @@
       return { id: savedId, name: pName };
     }
 
+    // ================= PRESENCE SYSTEM (ตรวจสอบการเชื่อมต่อ) =================
+    function setupPresence(roomCode, playerId) {
+      if(!window.db) return;
+      const myStatusRef = ref(window.db, `rooms/${roomCode}/presence/${playerId}`);
+      const connectedRef = ref(window.db, '.info/connected');
+
+      onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+          // หากเชื่อมต่อสำเร็จ ให้บอกว่า Online 
+          set(myStatusRef, { isOffline: false });
+          // หากเน็ตหลุด/ปิดเว็บ ให้ Firebase รีบเปลี่ยนค่าเป็น Offline อัตโนมัติ
+          onDisconnect(myStatusRef).set({ isOffline: true });
+        }
+      });
+    }
+
     window.handleCreateOnlineRoom = async function() {
       initAudio();
       if (!window.db) { alert("ขาดการเชื่อมต่อ Database"); return; }
@@ -1200,10 +1199,19 @@
       currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
       window.isMultiplayerHost = true;
 
-      waitingRoomPlayers = [{ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false }];
+      waitingRoomPlayers = [{ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false, isOffline: false }];
       waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers, parseInt(document.getElementById('onlineTargetTotal').value, 10));
 
-      await set(ref(window.db, `rooms/${currentRoomCode}`), { status: 'waiting', hostId: me.id, currentRound: 1, pathRemainder: 0, players: waitingRoomPlayers, updatedAt: Date.now() });
+      await set(ref(window.db, `rooms/${currentRoomCode}`), { 
+        status: 'waiting', 
+        hostId: me.id, 
+        currentRound: 1, 
+        pathRemainder: 0, 
+        players: waitingRoomPlayers, 
+        updatedAt: Date.now() 
+      });
+
+      setupPresence(currentRoomCode, me.id);
 
       document.getElementById('multiEntryBox').classList.add('hidden');
       document.getElementById('waitingRoomBox').classList.remove('hidden');
@@ -1231,10 +1239,13 @@
       let humans = pList.filter(p => !p.isAI);
       const existingIdx = humans.findIndex(p => String(p.id) === String(me.id));
       
-      if (existingIdx >= 0) humans[existingIdx].name = me.name;
-      else {
+      if (existingIdx >= 0) {
+        humans[existingIdx].name = me.name;
+        humans[existingIdx].isOffline = false; // กลับมาออนไลน์
+      } else {
+        if (data.status === 'playing') { alert('ห้องนี้เริ่มเล่นไปแล้ว ไม่สามารถเข้าร่วมกลางคันได้ครับ'); return; }
         if (humans.length >= 8) { alert('ห้องเต็ม!'); return; }
-        humans.push({ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false });
+        humans.push({ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false, isOffline: false });
       }
 
       const targetCount = Math.max(humans.length, Math.min(8, pList.length));
@@ -1244,6 +1255,8 @@
       window.isMultiplayerHost = (String(data.hostId) === String(me.id));
 
       await update(roomRef, { players: updatedList, updatedAt: Date.now() });
+
+      setupPresence(code, me.id);
 
       document.getElementById('multiEntryBox').classList.add('hidden');
       document.getElementById('waitingRoomBox').classList.remove('hidden');
@@ -1261,7 +1274,7 @@
         const needBots = Math.min(8 - humanList.length, targetTotal - humanList.length);
         for (let i = 0; i < needBots; i++) {
           const b = BOT_PROFILES[i % BOT_PROFILES.length];
-          combined.push({ id: 'bot_'+(i+1), name: b.n+' (AI)', isAI: true, inTemple: true, bag: 0, chest: 0, profile: b.p, riskBase: b.riskBase, riskMod: 0, currentChoice: null, hasForfeited: false });
+          combined.push({ id: 'bot_'+(i+1), name: b.n+' (AI)', isAI: true, inTemple: true, bag: 0, chest: 0, profile: b.p, riskBase: b.riskBase, riskMod: 0, currentChoice: null, hasForfeited: false, isOffline: false });
         }
       }
       return combined;
@@ -1310,6 +1323,28 @@
         const data = snap.val();
         if (!data) return;
         const pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
+        
+        // Host Update Offline Status from Presence Nodes
+        if (window.isMultiplayerHost && data.status === 'playing' && data.presence) {
+           let stateChanged = false;
+           pList.forEach((p, idx) => {
+              if(!p.isAI && data.presence[p.id] && data.presence[p.id].isOffline === true) {
+                 if(!p.isOffline || !p.hasForfeited) {
+                    p.isOffline = true;
+                    p.hasForfeited = true;
+                    p.inTemple = false;
+                    p.bag = 0;
+                    p.chest = 0;
+                    p.currentChoice = 'return';
+                    stateChanged = true;
+                 }
+              }
+           });
+           if(stateChanged) {
+              players = pList;
+              update(ref(window.db, `rooms/${code}/players`), players);
+           }
+        }
 
         if (data.status === 'waiting') {
           waitingRoomPlayers = pList; renderWaitingRoomPlayers(pList); return;
@@ -1322,11 +1357,10 @@
           document.getElementById('gameLayout').classList.add('flex');
 
           if (!window.isMultiplayerHost) {
-            // ================= CLIENT UPDATE =================
+            // Client Update
             players = pList; currentRound = data.currentRound || 1; pathRemainder = data.pathRemainder || 0;
             activeHazardsOnPath = data.activeHazardsOnPath || []; hazardCounts = data.hazardCounts || hazardCounts;
 
-            // Sync Log
             if (data.logs && data.logs.length > 0) {
               document.getElementById('logBox').innerHTML = data.logs.map(html => `<div class="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed">${html}</div>`).join('');
             } else {
@@ -1340,11 +1374,9 @@
                 currentPathCards.push(sc[i]); playSFX('flip'); renderCard(sc[i], i);
               }
             } else {
-               // Update claimed status visuals locally
                sc.forEach((c, i) => { if(c.claimed) { const w = document.getElementById(`cWrap-${i}`); if(w) w.classList.add('claimed'); } });
             }
 
-            // Sync Round Tracker Images
             document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
             for(let i=1; i<=5; i++) {
               const tCard = document.getElementById(`tcard-${i}`);
@@ -1357,36 +1389,35 @@
             updateUI(); updateDeckTracker();
 
             const me = players.find(p => String(p.id) === String(localPlayerId));
+            
+            if(data.phase === 'round_ended' && sc.length > 0 && sc[sc.length-1].type === 'hazard') {
+               const lastC = sc[sc.length-1];
+               if(activeHazardsOnPath.includes(lastC.hType)) {
+                 if(!window.localCollapseAlerted) {
+                    window.localCollapseAlerted = true;
+                    playSFX('collapse');
+                    document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
+                    setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
+                 }
+               }
+            }
 
             if (data.phase === 'game_ended') {
                showFinalScore();
             } else if (data.phase === 'round_ended') {
               stopDecisionTimer(); setButtonsEnabled(false);
-              toggleActionUI('hideAll');
               document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องเริ่มวิหารที่ ${currentRound + 1}...`;
               document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
-              
-              // Trigger client shake exactly once per round end
-              if (!window.localCollapseAlerted && sc.length > 0 && sc[sc.length-1].type === 'hazard' && activeHazardsOnPath.includes(sc[sc.length-1].hType)) {
-                 window.localCollapseAlerted = true;
-                 playSFX('collapse');
-                 document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
-                 setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
-              }
-            } else {
-              window.localCollapseAlerted = false; // Reset for next rounds
-              toggleActionUI('decision');
-              if (me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
-                isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
-              } else if (me && (!me.inTemple || me.hasForfeited)) {
-                stopDecisionTimer(); setButtonsEnabled(false);
-                document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
-              }
+            } else if (me && me.inTemple && !me.currentChoice && !me.hasForfeited && !me.isOffline) {
+              isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
+            } else if (me && (!me.inTemple || me.hasForfeited || me.isOffline)) {
+              stopDecisionTimer(); setButtonsEnabled(false);
+              document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
             }
           } else {
-            // ================= HOST LOGIC =================
+            // Host logic checks
             players = pList;
-            const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
+            const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited && !p.isOffline);
             const allChosen = activeHumans.every(p => p.currentChoice === 'explore' || p.currentChoice === 'return');
             const turnKey = `${currentRound}_${currentPathCards.length}`;
             
@@ -1397,10 +1428,9 @@
               stopDecisionTimer();
               clearTimeout(gameTimeouts.bot);
               const decisions = {};
-              players.forEach(p => { if (!p.inTemple || p.hasForfeited) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
+              players.forEach(p => { if (!p.inTemple || p.hasForfeited || p.isOffline) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
               processDecisions(decisions);
-            } else if (activeHumans.length === 0 && players.some(p => p.inTemple && p.isAI && !p.hasForfeited) && lastProcessedTurnKey !== turnKey) {
-              // No humans left, let bots finish the run instantly
+            } else if (activeHumans.length === 0 && players.some(p => p.inTemple && p.isAI && !p.hasForfeited && !p.isOffline) && lastProcessedTurnKey !== turnKey) {
               lastProcessedTurnKey = turnKey;
               stopDecisionTimer();
               clearTimeout(gameTimeouts.bot);
