@@ -336,7 +336,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </button>
           <button onclick="openModal('modalRules')" class="top-btn text-sky-400 font-title font-bold text-lg" title="วิธีเล่น">?</button>
-          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ออกจากเกม">🏠</button>
+          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/กลับหน้าแรก">🏠</button>
         </div>
       </div>
     </header>
@@ -355,7 +355,6 @@
         </div>
 
         <div class="custom-panel-stone rounded-xl flex items-center shadow-xl relative overflow-hidden">
-          <!-- การ์ดเล็กลง 35% ยัดเข้ากลางพอดี -->
           <div id="cardsScroll" class="flex gap-2.5 overflow-x-auto py-1 px-1 items-center w-full scroll-smooth">
             <!-- Cards injected here -->
           </div>
@@ -375,7 +374,6 @@
                <div class="timer-bar-container"><div id="timerFill" class="timer-bar-fill"></div></div>
             </div>
           </div>
-          <!-- ผู้เล่นขยายขึ้นให้ข้อมูลอยู่ตรงกลาง -->
           <div id="playersGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2">
             <!-- Player frames here -->
           </div>
@@ -471,7 +469,7 @@
   </div>
 
   <script>
-    /* --- Modal & Sound Logic --- */
+    /* --- Modal, UI Toggle & Sound Logic --- */
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -482,6 +480,24 @@
       document.getElementById('multiModePanel').classList.toggle('flex', !isSingle);
       document.getElementById('tabSingleBtn').className = isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
       document.getElementById('tabMultiBtn').className = !isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
+    }
+
+    function toggleActionUI(mode) {
+      const dec = document.getElementById('decisionControls');
+      const nxt = document.getElementById('nextRoundBtn');
+      if (mode === 'decision') {
+        dec.classList.remove('hidden');
+        dec.classList.add('grid');
+        nxt.classList.add('hidden');
+      } else if (mode === 'nextRound') {
+        dec.classList.add('hidden');
+        dec.classList.remove('grid');
+        nxt.classList.remove('hidden');
+      } else if (mode === 'hideAll') {
+        dec.classList.add('hidden');
+        dec.classList.remove('grid');
+        nxt.classList.add('hidden');
+      }
     }
 
     let audioCtx = null;
@@ -554,6 +570,9 @@
     window.multiplayerLogs = [];
     window.localCollapseAlerted = false;
     
+    /* --- Timeout Management --- */
+    const gameTimeouts = { draw: null, bot: null, end: null };
+
     /* --- Timer Logic --- */
     let decisionTimer = null;
     let timeLeft = 15;
@@ -606,7 +625,8 @@
     document.getElementById('btnStartGame').addEventListener('click', () => { initAudio(); startGame(); });
     document.getElementById('exploreBtn').addEventListener('click', () => { initAudio(); handleChoice('explore'); });
     document.getElementById('returnBtn').addEventListener('click', () => { initAudio(); handleChoice('return'); });
-    document.getElementById('nextRoundBtn').addEventListener('click', () => {
+    document.getElementById('nextRoundBtn').addEventListener('click', (e) => {
+      e.currentTarget.classList.add('hidden'); // ซ่อนปุ่มทันทีเพื่อป้องกันการกดเบิ้ล
       if (isOnlineMode && window.isMultiplayerHost) {
         window.hostNextRoundMultiplayer();
       } else {
@@ -686,6 +706,8 @@
     function startNewRound() {
       isProcessing = false; currentPathCards = []; activeHazardsOnPath = []; pathRemainder = 0;
       window.localCollapseAlerted = false;
+      Object.values(gameTimeouts).forEach(clearTimeout);
+
       players.forEach(p => { if(!p.hasForfeited) { p.inTemple = true; p.bag = 0; p.currentChoice = null; }});
 
       window.multiplayerLogs = [];
@@ -710,12 +732,13 @@
 
       document.getElementById('cardsScroll').innerHTML = ''; 
       
+      toggleActionUI('decision');
       setButtonsEnabled(false);
       updateUI(); updateDeckTracker();
       log(`<span class="text-amber-400 font-bold text-sm">⛩️ เริ่มสำรวจวิหารที่ ${currentRound}/5</span>`);
 
       if (!isOnlineMode || window.isMultiplayerHost) {
-        setTimeout(drawCard, 600);
+        gameTimeouts.draw = setTimeout(drawCard, 600);
       }
     }
 
@@ -809,7 +832,9 @@
           
           updateUI(); updateDeckTracker();
           if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-          setTimeout(endRound, 1000); 
+          
+          clearTimeout(gameTimeouts.end);
+          gameTimeouts.end = setTimeout(endRound, 1000); 
           return;
         } else {
           activeHazardsOnPath.push(card.hType);
@@ -827,7 +852,6 @@
         window.syncHostStateToFirebase('decision');
       }
 
-      // เช็คว่าเหลือใครอยู่ในวิหารบ้างไหม
       const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
 
@@ -835,16 +859,16 @@
         document.getElementById('statusNotice').innerText = "บอทกำลังสำรวจต่อ...";
         document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
         setButtonsEnabled(false);
-        if (!isOnlineMode || window.isMultiplayerHost) {
-          // ถ้าไม่มีคนจริงเหลือ ให้รันบอทอัตโนมัติเลยโดยไม่ค้างรอ
-          setTimeout(() => runBotOnlyTurn(), 400);
+        if (!isOnlineMode) {
+          clearTimeout(gameTimeouts.bot);
+          gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
         }
       } 
       else { 
         isProcessing = false; 
         if(me.inTemple && !me.hasForfeited) {
           setButtonsEnabled(true); 
-          startDecisionTimer(); // เริ่มจับเวลา 15 วิ
+          startDecisionTimer(); 
         } else {
           document.getElementById('statusNotice').innerText = "รอผู้เล่นคนอื่นตัดสินใจ...";
           document.getElementById('statusNotice').className = "text-[10px] font-title text-amber-300 font-bold mb-0.5 text-right w-full truncate animate-pulse";
@@ -905,7 +929,7 @@
         if (returners.length === 1) {
           currentPathCards.forEach((c, i) => {
             if(c.type === 'artifact' && !c.claimed) {
-              c.claimed = true; // Mark as claimed without flipping
+              c.claimed = true; 
               returners[0].chest += c.val;
               const w = document.getElementById(`cWrap-${i}`); 
               if(w) w.classList.add('claimed');
@@ -922,16 +946,17 @@
       players.forEach(p => p.currentChoice = null);
       updateUI();
       
-      // Sync resolving state right away to prevent race conditions in MP
       if (isOnlineMode && window.isMultiplayerHost) {
           window.syncHostStateToFirebase('resolving');
       }
 
       if(continuers.length === 0) { 
         if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-        setTimeout(endRound, 800); 
+        clearTimeout(gameTimeouts.end);
+        gameTimeouts.end = setTimeout(endRound, 800); 
       } else { 
-        setTimeout(drawCard, 350); // Faster draw
+        clearTimeout(gameTimeouts.draw);
+        gameTimeouts.draw = setTimeout(drawCard, 350); 
       } 
     }
 
@@ -979,6 +1004,7 @@
       isProcessing = true;
       stopDecisionTimer();
       setButtonsEnabled(false);
+      toggleActionUI('hideAll'); 
       document.getElementById('statusNotice').innerText = `สิ้นสุดวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
@@ -997,12 +1023,13 @@
            }, 1500);
         }
       } else {
-        // ออโต้ไปรอบถัดไปสำหรับเล่นคนเดียว
         if (!isOnlineMode) {
           setTimeout(() => { currentRound++; startNewRound(); }, 2000);
         } else if (window.isMultiplayerHost) {
-          // แจ้งเตือน Host ให้ออกคำสั่งไปรอบถัดไป
-          document.getElementById('nextRoundBtn').style.display = 'block';
+          setTimeout(() => {
+             toggleActionUI('nextRound');
+             document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องกดไปรอบถัดไป...`;
+          }, 1000);
         }
       }
     }
@@ -1264,10 +1291,7 @@
 
     window.syncHostStateToFirebase = async function(phase) {
       if (!window.db || !currentRoomCode || !window.isMultiplayerHost) return;
-      await update(ref(window.db, `rooms/${currentRoomCode}`), { 
-        status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, 
-        currentPathCards, activeHazardsOnPath, hazardCounts, players, logs: window.multiplayerLogs, updatedAt: Date.now() 
-      });
+      await update(ref(window.db, `rooms/${currentRoomCode}`), { status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, currentPathCards, activeHazardsOnPath, hazardCounts, players, logs: window.multiplayerLogs, updatedAt: Date.now() });
     };
 
     window.submitMultiplayerChoice = async function(choice) {
@@ -1338,6 +1362,7 @@
                showFinalScore();
             } else if (data.phase === 'round_ended') {
               stopDecisionTimer(); setButtonsEnabled(false);
+              toggleActionUI('hideAll');
               document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องเริ่มวิหารที่ ${currentRound + 1}...`;
               document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
               
@@ -1350,6 +1375,7 @@
               }
             } else {
               window.localCollapseAlerted = false; // Reset for next rounds
+              toggleActionUI('decision');
               if (me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
                 isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
               } else if (me && (!me.inTemple || me.hasForfeited)) {
@@ -1369,6 +1395,7 @@
             } else if (activeHumans.length > 0 && allChosen && lastProcessedTurnKey !== turnKey) {
               lastProcessedTurnKey = turnKey;
               stopDecisionTimer();
+              clearTimeout(gameTimeouts.bot);
               const decisions = {};
               players.forEach(p => { if (!p.inTemple || p.hasForfeited) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
               processDecisions(decisions);
@@ -1376,7 +1403,8 @@
               // No humans left, let bots finish the run instantly
               lastProcessedTurnKey = turnKey;
               stopDecisionTimer();
-              setTimeout(() => runBotOnlyTurn(), 400);
+              clearTimeout(gameTimeouts.bot);
+              gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
             }
           }
         }
