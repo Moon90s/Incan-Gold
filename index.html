@@ -150,8 +150,6 @@
     .custom-frame-me { background-image: var(--frame-player); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.55)); }
     .custom-frame-camped { background-image: var(--frame-player-camped); opacity: 0.85; filter: grayscale(15%); }
 
-    /* Forfeited / Offline Style */
-    .custom-frame-forfeited { background-image: var(--frame-player-camped); opacity: 0.4; filter: grayscale(100%); }
     .text-strong-shadow { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85); }
 
     /* Temple Round Cards - 100% Fit */
@@ -160,7 +158,7 @@
     .temple-past { border-color: #475569; opacity: 0.85; }
     .temple-unexplored { border-color: #334155; opacity: 0.8; }
 
-    /* 3D Card Flip */
+    /* 3D Card Flip (ปรับขนาด 35%) */
     .card-scene { perspective: 1200px; }
     .card-object { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s ease-out; transform: rotateY(180deg); }
     .card-object.flipped { transform: rotateY(0deg); }
@@ -170,6 +168,7 @@
     .card-face-front.hazard-card { border-color: #ef4444; }
     .card-face-front.artifact-card { border-color: #38bdf8; }
     
+    /* สไตล์เมื่อ Artifact โดนเก็บไปแล้วจะจางลง แทนที่จะคว่ำหน้า */
     .card-scene.claimed { opacity: 0.35; transition: opacity 0.5s ease; filter: grayscale(50%); }
 
     .card-leftover { position: absolute; top: -8px; right: -8px; background: #f59e0b; color: #000; font-family: var(--font-title); font-size: 0.9rem; font-weight: 800; padding: 1px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.85); z-index: 20; border: 2px solid #fff; }
@@ -337,7 +336,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </button>
           <button onclick="openModal('modalRules')" class="top-btn text-sky-400 font-title font-bold text-lg" title="วิธีเล่น">?</button>
-          <button onclick="requestForfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/ออกจากห้อง">🏠</button>
+          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/กลับหน้าแรก">🏠</button>
         </div>
       </div>
     </header>
@@ -356,7 +355,9 @@
         </div>
 
         <div class="custom-panel-stone rounded-xl flex items-center shadow-xl relative overflow-hidden">
-          <div id="cardsScroll" class="flex gap-2.5 overflow-x-auto py-1 px-1 items-center w-full scroll-smooth"></div>
+          <div id="cardsScroll" class="flex gap-2.5 overflow-x-auto py-1 px-1 items-center w-full scroll-smooth">
+            <!-- Cards injected here -->
+          </div>
         </div>
       </div>
 
@@ -373,7 +374,9 @@
                <div class="timer-bar-container"><div id="timerFill" class="timer-bar-fill"></div></div>
             </div>
           </div>
-          <div id="playersGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
+          <div id="playersGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <!-- Player frames here -->
+          </div>
         </div>
 
         <div id="controlsArea">
@@ -623,7 +626,7 @@
     document.getElementById('exploreBtn').addEventListener('click', () => { initAudio(); handleChoice('explore'); });
     document.getElementById('returnBtn').addEventListener('click', () => { initAudio(); handleChoice('return'); });
     document.getElementById('nextRoundBtn').addEventListener('click', (e) => {
-      e.currentTarget.classList.add('hidden');
+      e.currentTarget.classList.add('hidden'); // ซ่อนปุ่มทันทีเพื่อป้องกันการกดเบิ้ล
       if (isOnlineMode && window.isMultiplayerHost) {
         window.hostNextRoundMultiplayer();
       } else {
@@ -633,22 +636,20 @@
     });
 
     /* --- Forfeit / Exit --- */
-    window.requestForfeitGame = async function() {
-      if(!confirm("คุณต้องการออกจากเกมหรือไม่?\n(เพชรในรอบนี้จะเป็น 0 และจะถูกตัดออกจากการเล่น)")) return;
+    window.forfeitGame = async function() {
+      if(!confirm("คุณต้องการออกจากเกมหรือไม่?\n(คุณจะถูกปรับแพ้และตัดออกจากรอบนี้ทันที)")) return;
       
-      if(isOnlineMode && window.db && currentRoomCode) {
-        const meIdx = players.findIndex(p => String(p.id) === String(localPlayerId));
-        if(meIdx >= 0) {
-           import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(async ({ref, update}) => {
-              await update(ref(window.db, `rooms/${currentRoomCode}/players/${meIdx}`), {
-                inTemple: false, bag: 0, chest: 0, currentChoice: 'return', hasForfeited: true, isOffline: true
-              });
-              location.reload();
-           });
-           return;
-        }
+      const meIdx = players.findIndex(p => String(p.id) === String(localPlayerId));
+      if(isOnlineMode && window.db && currentRoomCode && meIdx >= 0) {
+        import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(async ({ref, update}) => {
+          await update(ref(window.db, `rooms/${currentRoomCode}/players/${meIdx}`), {
+            inTemple: false, bag: 0, chest: 0, currentChoice: 'return', hasForfeited: true
+          });
+          location.reload();
+        });
+      } else {
+        location.reload();
       }
-      location.reload();
     }
 
     /* --- Core Logic --- */
@@ -660,13 +661,13 @@
         localPlayerId = 0;
         const pName = document.getElementById('playerNameInput').value || 'อินดี้';
         const botCount = parseInt(document.getElementById('botCountInput').value);
-        players = [{ id: 0, name: pName, isAI: false, inTemple: true, bag: 0, chest: 0, profile: null, bustCount: 0, riskMod: 0, hasForfeited: false, isOffline: false }];
+        players = [{ id: 0, name: pName, isAI: false, inTemple: true, bag: 0, chest: 0, profile: null, bustCount: 0, riskMod: 0, hasForfeited: false }];
         
         let bots = [...BOT_PROFILES].sort(() => 0.5 - Math.random());
         for(let i=0; i<botCount; i++) {
           players.push({
             id: i+1, name: bots[i].n, isAI: true, inTemple: true, bag: 0, chest: 0,
-            profile: bots[i].p, riskBase: bots[i].riskBase, bustCount: 0, riskMod: (Math.random() * 0.06) - 0.03, hasForfeited: false, isOffline: false
+            profile: bots[i].p, riskBase: bots[i].riskBase, bustCount: 0, riskMod: (Math.random() * 0.06) - 0.03, hasForfeited: false
           });
         }
       }
@@ -705,17 +706,12 @@
     function startNewRound() {
       isProcessing = false; currentPathCards = []; activeHazardsOnPath = []; pathRemainder = 0;
       window.localCollapseAlerted = false;
+      Object.values(gameTimeouts).forEach(clearTimeout);
 
-      players.forEach(p => { 
-        if(!p.hasForfeited && !p.isOffline) { 
-          p.inTemple = true; p.bag = 0; p.currentChoice = null; 
-        } else {
-          p.inTemple = false; p.bag = 0; p.currentChoice = 'return';
-        }
-      });
+      players.forEach(p => { if(!p.hasForfeited) { p.inTemple = true; p.bag = 0; p.currentChoice = null; }});
 
       window.multiplayerLogs = [];
-      document.getElementById('logBox').innerHTML = ''; 
+      document.getElementById('logBox').innerHTML = '';
       document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
 
       for(let i=1; i<=5; i++) {
@@ -735,14 +731,14 @@
       deck.sort(() => 0.5 - Math.random());
 
       document.getElementById('cardsScroll').innerHTML = ''; 
-      document.getElementById('nextRoundBtn').classList.add('hidden');
       
+      toggleActionUI('decision');
       setButtonsEnabled(false);
       updateUI(); updateDeckTracker();
       log(`<span class="text-amber-400 font-bold text-sm">⛩️ เริ่มสำรวจวิหารที่ ${currentRound}/5</span>`);
 
       if (!isOnlineMode || window.isMultiplayerHost) {
-        setTimeout(drawCard, 600);
+        gameTimeouts.draw = setTimeout(drawCard, 600);
       }
     }
 
@@ -808,7 +804,7 @@
     }
 
     function processCard(card, idx) {
-      const inTemple = players.filter(p => p.inTemple && !p.hasForfeited && !p.isOffline);
+      const inTemple = players.filter(p => p.inTemple && !p.hasForfeited);
 
       if (card.type === 'treasure') {
         const share = Math.floor(card.value / inTemple.length);
@@ -836,7 +832,9 @@
           
           updateUI(); updateDeckTracker();
           if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-          setTimeout(endRound, 1000); 
+          
+          clearTimeout(gameTimeouts.end);
+          gameTimeouts.end = setTimeout(endRound, 1000); 
           return;
         } else {
           activeHazardsOnPath.push(card.hType);
@@ -854,20 +852,21 @@
         window.syncHostStateToFirebase('decision');
       }
 
-      const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited && !p.isOffline);
+      const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
 
       if(activeHumans.length === 0) { 
         document.getElementById('statusNotice').innerText = "บอทกำลังสำรวจต่อ...";
         document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
         setButtonsEnabled(false);
-        if (!isOnlineMode || window.isMultiplayerHost) {
-          setTimeout(() => runBotOnlyTurn(), 500);
+        if (!isOnlineMode) {
+          clearTimeout(gameTimeouts.bot);
+          gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
         }
       } 
       else { 
         isProcessing = false; 
-        if(me.inTemple && !me.hasForfeited && !me.isOffline) {
+        if(me.inTemple && !me.hasForfeited) {
           setButtonsEnabled(true); 
           startDecisionTimer(); 
         } else {
@@ -880,7 +879,7 @@
 
     function handleChoice(humanAction) {
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
-      if(isProcessing || !me.inTemple || me.hasForfeited || me.isOffline) return;
+      if(isProcessing || !me.inTemple || me.hasForfeited) return;
       isProcessing = true; 
       stopDecisionTimer();
       setButtonsEnabled(false);
@@ -894,14 +893,14 @@
 
       const decisions = {};
       players.forEach(p => {
-        if(!p.inTemple || p.hasForfeited || p.isOffline) return;
+        if(!p.inTemple || p.hasForfeited) return;
         decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : humanAction;
       });
       processDecisions(decisions);
     }
 
     function runBotOnlyTurn() {
-      const activeBots = players.filter(p => p.inTemple && p.isAI && !p.hasForfeited && !p.isOffline);
+      const activeBots = players.filter(p => p.inTemple && p.isAI);
       if(activeBots.length === 0) { endRound(); return; }
       const decisions = {};
       activeBots.forEach(p => { decisions[p.id] = calcSmartBotDecision(p); });
@@ -909,8 +908,8 @@
     }
     
     function processDecisions(decisions) {
-      const returners = players.filter(p => p.inTemple && decisions[p.id] === 'return' && !p.hasForfeited && !p.isOffline);
-      const continuers = players.filter(p => p.inTemple && decisions[p.id] === 'explore' && !p.hasForfeited && !p.isOffline);
+      const returners = players.filter(p => p.inTemple && decisions[p.id] === 'return' && !p.hasForfeited);
+      const continuers = players.filter(p => p.inTemple && decisions[p.id] === 'explore' && !p.hasForfeited);
 
       if (returners.length > 0) {
         const sRem = Math.floor(pathRemainder / returners.length);
@@ -953,9 +952,11 @@
 
       if(continuers.length === 0) { 
         if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
-        setTimeout(endRound, 800); 
+        clearTimeout(gameTimeouts.end);
+        gameTimeouts.end = setTimeout(endRound, 800); 
       } else { 
-        setTimeout(drawCard, 400); 
+        clearTimeout(gameTimeouts.draw);
+        gameTimeouts.draw = setTimeout(drawCard, 350); 
       } 
     }
 
@@ -963,7 +964,7 @@
       const hzCount = activeHazardsOnPath.length;
       if (hzCount === 0) return 'explore';
 
-      const inTempleCount = players.filter(x => x.inTemple && !x.hasForfeited && !x.isOffline).length;
+      const inTempleCount = players.filter(x => x.inTemple && !x.hasForfeited).length;
       const unclaimedArts = currentPathCards.filter(c => c.type === 'artifact' && !c.claimed);
       const artValueOnPath = unclaimedArts.reduce((sum, a) => sum + a.val, 0);
 
@@ -1004,7 +1005,7 @@
       stopDecisionTimer();
       setButtonsEnabled(false);
       toggleActionUI('hideAll'); 
-      document.getElementById('statusNotice').innerText = `สิ้นสุดการสำรวจวิหารที่ ${currentRound}`;
+      document.getElementById('statusNotice').innerText = `สิ้นสุดวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
       currentPathCards.forEach(c => {
@@ -1027,4 +1028,392 @@
         } else if (window.isMultiplayerHost) {
           setTimeout(() => {
              toggleActionUI('nextRound');
-             document.getElementById('
+             document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องกดไปรอบถัดไป...`;
+          }, 1000);
+        }
+      }
+    }
+
+    function showFinalScore() {
+      updateUI(true); 
+      const s = [...players].filter(p => !p.hasForfeited).sort((a,b) => b.chest - a.chest);
+      const rList = document.getElementById('rankList'); rList.innerHTML = '';
+      s.forEach((p, i) => {
+        const el = document.createElement('div');
+        const isMe = String(p.id) === String(localPlayerId);
+        el.className = `flex justify-between items-center px-4 py-2.5 rounded-xl border ${i===0 ? 'bg-amber-900/40 border-amber-500' : 'bg-slate-900/50 border-slate-700'}`;
+        el.innerHTML = `<div class="flex items-center gap-3"><span class="w-6 text-xl text-center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="font-title font-bold text-base ${isMe ? 'text-amber-300':'text-slate-200'}">${p.name}</span></div><div class="font-title font-bold text-amber-400 text-lg">${p.chest} 💎</div>`;
+        rList.appendChild(el);
+      });
+      openModal('summaryModal');
+    }
+
+    function updateUI(revealTents = false) {
+      document.getElementById('pathRemainder').innerText = pathRemainder;
+      const pg = document.getElementById('playersGrid'); pg.innerHTML = '';
+      players.forEach(p => {
+        if (p.hasForfeited) return; 
+        const c = document.createElement('div');
+        const isMe = String(p.id) === String(localPlayerId);
+        const frameClass = p.inTemple
+          ? (isMe ? 'custom-frame-me' : 'custom-frame-active')
+          : 'custom-frame-camped';
+
+        c.className = `player-frame-box rounded-xl ${frameClass}`;
+        c.id = `player-${p.id}`; 
+        
+        const tStr = (isMe || revealTents) ? p.chest : '?';
+        const stB = p.inTemple
+          ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow">ลุย</span>`
+          : `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-sky-950/90 text-sky-300 border border-sky-500/50 shadow">กลับ</span>`;
+        
+        c.innerHTML = `
+          <div class="flex justify-between items-center gap-1 px-1">
+            <span class="font-title font-bold text-xs sm:text-sm truncate ${isMe ? 'text-amber-200' : 'text-white'} text-strong-shadow">
+              ${p.name.split(' ')[0]}${isMe ? ' (คุณ)' : ''}
+            </span>
+            ${stB}
+          </div>
+          <div class="flex justify-between items-center bg-black/55 px-2.5 py-1 rounded-lg border border-white/10">
+            <div class="flex items-center gap-1.5">
+              <div class="icon-bag w-5 h-5 shrink-0 drop-shadow"></div>
+              <span class="font-mono font-bold text-amber-300 text-sm text-strong-shadow">${p.bag}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="icon-tent w-5 h-5 shrink-0 drop-shadow"></div>
+              <span class="font-mono font-bold text-slate-100 text-sm text-strong-shadow">${tStr}</span>
+            </div>
+          </div>
+        `;
+        pg.appendChild(c);
+      });
+    }
+
+    function updateDeckTracker() {
+      document.getElementById('deckCount').innerText = deck.length;
+      document.getElementById('artCount').innerText = deck.filter(c => c.type === 'artifact').length;
+      
+      let dangerCount = 0;
+      HAZARD_TYPES.forEach(h => {
+        const remaining = hazardCounts[h.id];
+        const drawn = activeHazardsOnPath.filter(x => x === h.id).length;
+        
+        const topHz = document.getElementById(`hz-${h.id}`);
+        if(topHz) {
+          topHz.innerText = remaining;
+          if(drawn > 0) topHz.parentElement.classList.add('text-rose-400', 'animate-pulse');
+          else topHz.parentElement.classList.remove('text-rose-400', 'animate-pulse');
+        }
+
+        const modSpan = document.getElementById(`hzMod-${h.id}`);
+        const statSpan = document.getElementById(`hzStat-${h.id}`);
+        const row = document.getElementById(`hzRow-${h.id}`);
+        if(modSpan) modSpan.innerText = remaining;
+        
+        if(drawn > 0) {
+          dangerCount++;
+          if(statSpan) { statSpan.innerText = "⚠️ เตือนภัย!"; statSpan.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-950 text-rose-300 border border-rose-600 animate-pulse"; }
+          if(row) row.classList.add('border-rose-800/80');
+        } else {
+          if(statSpan) { statSpan.innerText = "ปลอดภัย"; statSpan.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700"; }
+          if(row) row.classList.remove('border-rose-800/80');
+        }
+      });
+
+      const badge = document.getElementById('hazardBadge');
+      if(dangerCount > 0) { badge.innerText = dangerCount; badge.classList.remove('hidden'); }
+      else { badge.classList.add('hidden'); }
+    }
+
+    function log(msg) {
+      const box = document.getElementById('logBox');
+      const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const logHtml = `<span class="text-[10px] text-slate-400 font-mono mr-1">[${time}]</span> <span class="text-[11px] md:text-xs">${msg}</span>`;
+      const d = document.createElement('div'); 
+      d.className = 'bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed'; 
+      d.innerHTML = logHtml;
+      box.prepend(d);
+
+      if (!isOnlineMode || window.isMultiplayerHost) {
+        window.multiplayerLogs.unshift(logHtml);
+        if(window.multiplayerLogs.length > 40) window.multiplayerLogs.pop();
+      }
+    }
+  </script>
+
+  <!-- ================= ระบบหลังบ้าน FIREBASE MULTIPLAYER ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    /* =========================================================================
+       📌 วางค่า firebaseConfig
+       ========================================================================= */
+    const firebaseConfig = {
+ 	    apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
+  	  authDomain: "incan-gold-deluxe.firebaseapp.com",
+  	  databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  	  projectId: "incan-gold-deluxe",
+  	  storageBucket: "incan-gold-deluxe.firebasestorage.app",
+  	  messagingSenderId: "1034905115077",
+  	  appId: "1:1034905115077:web:ead1c2f72f305c3397d3ac",
+  	  measurementId: "G-RG4JJLMFXL"
+    };
+
+    const statusEl = document.getElementById('firebaseStatusText');
+    window.db = null;
+    let currentRoomCode = null;
+    let roomUnsubscribe = null;
+    let lastProcessedTurnKey = "";
+    window.isMultiplayerHost = false;
+
+    const hasValidKey = firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+    if (!hasValidKey) {
+      statusEl.innerHTML = "⚠️ <b>ทดสอบเล่นคนเดียว (ไม่เชื่อมต่อ Firebase)</b>";
+      statusEl.className = "text-[11px] text-amber-400 text-center bg-amber-950/40 p-2 rounded-lg";
+    } else {
+      try {
+        const app = initializeApp(firebaseConfig);
+        window.db = getDatabase(app);
+        statusEl.innerHTML = "🟢 <b>พร้อมเล่นออนไลน์</b>";
+        statusEl.className = "text-[11px] text-emerald-400 text-center";
+      } catch (err) {
+        statusEl.innerHTML = "❌ <b>ตั้งค่า Firebase ผิดพลาด:</b> " + err.message;
+      }
+    }
+
+    let waitingRoomPlayers = [];
+
+    function getOrCreatePlayerIdentity() {
+      const pName = document.getElementById('playerNameInput').value.trim() || 'นักสำรวจ';
+      let savedId = sessionStorage.getItem('incan_player_uid');
+      if (!savedId) { savedId = 'p_' + Math.random().toString(36).substring(2, 9); sessionStorage.setItem('incan_player_uid', savedId); }
+      localPlayerId = savedId;
+      return { id: savedId, name: pName };
+    }
+
+    window.handleCreateOnlineRoom = async function() {
+      initAudio();
+      if (!window.db) { alert("ขาดการเชื่อมต่อ Database"); return; }
+
+      const me = getOrCreatePlayerIdentity();
+      currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
+      window.isMultiplayerHost = true;
+
+      waitingRoomPlayers = [{ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false }];
+      waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers, parseInt(document.getElementById('onlineTargetTotal').value, 10));
+
+      await set(ref(window.db, `rooms/${currentRoomCode}`), { status: 'waiting', hostId: me.id, currentRound: 1, pathRemainder: 0, players: waitingRoomPlayers, updatedAt: Date.now() });
+
+      document.getElementById('multiEntryBox').classList.add('hidden');
+      document.getElementById('waitingRoomBox').classList.remove('hidden');
+      document.getElementById('waitingRoomBox').classList.add('flex');
+      document.getElementById('hostBotControls').classList.remove('hidden');
+      document.getElementById('btnHostStartOnline').classList.remove('hidden');
+      document.getElementById('displayRoomCode').innerText = currentRoomCode;
+
+      subscribeRoom(currentRoomCode);
+    };
+
+    window.handleJoinOnlineRoom = async function() {
+      initAudio();
+      const code = document.getElementById('roomCodeInput').value.trim();
+      if (!code || !window.db) return;
+
+      const me = getOrCreatePlayerIdentity();
+      const roomRef = ref(window.db, `rooms/${code}`);
+      const snap = await get(roomRef);
+
+      if (!snap.exists()) { alert('ไม่พบห้อง!'); return; }
+      const data = snap.val();
+      
+      let pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
+      let humans = pList.filter(p => !p.isAI);
+      const existingIdx = humans.findIndex(p => String(p.id) === String(me.id));
+      
+      if (existingIdx >= 0) humans[existingIdx].name = me.name;
+      else {
+        if (humans.length >= 8) { alert('ห้องเต็ม!'); return; }
+        humans.push({ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false });
+      }
+
+      const targetCount = Math.max(humans.length, Math.min(8, pList.length));
+      const updatedList = buildCombinedPlayerList(humans, pList.filter(p=>p.isAI).length > 0 ? targetCount : 0);
+
+      currentRoomCode = code;
+      window.isMultiplayerHost = (String(data.hostId) === String(me.id));
+
+      await update(roomRef, { players: updatedList, updatedAt: Date.now() });
+
+      document.getElementById('multiEntryBox').classList.add('hidden');
+      document.getElementById('waitingRoomBox').classList.remove('hidden');
+      document.getElementById('waitingRoomBox').classList.add('flex');
+      document.getElementById('hostBotControls').classList.toggle('hidden', !window.isMultiplayerHost);
+      document.getElementById('btnHostStartOnline').classList.toggle('hidden', !window.isMultiplayerHost);
+      document.getElementById('displayRoomCode').innerText = currentRoomCode;
+
+      subscribeRoom(code);
+    };
+
+    function buildCombinedPlayerList(humanList, targetTotal) {
+      let combined = [...humanList];
+      if (targetTotal > humanList.length) {
+        const needBots = Math.min(8 - humanList.length, targetTotal - humanList.length);
+        for (let i = 0; i < needBots; i++) {
+          const b = BOT_PROFILES[i % BOT_PROFILES.length];
+          combined.push({ id: 'bot_'+(i+1), name: b.n+' (AI)', isAI: true, inTemple: true, bag: 0, chest: 0, profile: b.p, riskBase: b.riskBase, riskMod: 0, currentChoice: null, hasForfeited: false });
+        }
+      }
+      return combined;
+    }
+
+    window.updateOnlineBotsCount = async function() {
+      const targetTotal = parseInt(document.getElementById('onlineTargetTotal').value, 10);
+      waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers.filter(p => !p.isAI), targetTotal);
+      renderWaitingRoomPlayers(waitingRoomPlayers);
+      if (window.db && currentRoomCode && window.isMultiplayerHost) await update(ref(window.db, `rooms/${currentRoomCode}`), { players: waitingRoomPlayers, updatedAt: Date.now() });
+    };
+
+    function renderWaitingRoomPlayers(list) {
+      document.getElementById('waitingPlayerCount').innerText = list.length;
+      document.getElementById('waitingPlayersList').innerHTML = list.map(p => `<div class="px-2 py-1 rounded bg-slate-800 border ${String(p.id) === String(localPlayerId) ? 'border-amber-400' : 'border-slate-700'} text-xs font-bold truncate">${p.isAI ? '🤖' : '🤠'} ${p.name}</div>`).join('');
+    }
+
+    window.hostStartMultiplayerGame = function() {
+      isOnlineMode = true; startGame(waitingRoomPlayers);
+    };
+
+    window.shareRoomUrl = function() {
+      const url = `${window.location.origin}${window.location.pathname}?room=${currentRoomCode}`;
+      if (navigator.share) navigator.share({ title: 'Incan Gold Deluxe', url });
+      else { navigator.clipboard.writeText(url); alert(`คัดลอกลิงก์ห้องแล้ว:\n${url}`); }
+    };
+
+    window.syncHostStateToFirebase = async function(phase) {
+      if (!window.db || !currentRoomCode || !window.isMultiplayerHost) return;
+      await update(ref(window.db, `rooms/${currentRoomCode}`), { status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, currentPathCards, activeHazardsOnPath, hazardCounts, players, logs: window.multiplayerLogs, updatedAt: Date.now() });
+    };
+
+    window.submitMultiplayerChoice = async function(choice) {
+      if (!window.db || !currentRoomCode) return;
+      const idx = players.findIndex(p => String(p.id) === String(localPlayerId));
+      if (idx >= 0) await update(ref(window.db, `rooms/${currentRoomCode}/players/${idx}`), { currentChoice: choice });
+    };
+
+    window.hostNextRoundMultiplayer = function() {
+      currentRound++; startNewRound(); window.syncHostStateToFirebase('drawing');
+    };
+
+    function subscribeRoom(code) {
+      if (roomUnsubscribe) roomUnsubscribe();
+      roomUnsubscribe = onValue(ref(window.db, `rooms/${code}`), (snap) => {
+        const data = snap.val();
+        if (!data) return;
+        const pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
+
+        if (data.status === 'waiting') {
+          waitingRoomPlayers = pList; renderWaitingRoomPlayers(pList); return;
+        }
+
+        if (data.status === 'playing') {
+          isOnlineMode = true;
+          document.getElementById('lobbyScreen').classList.add('hidden');
+          document.getElementById('gameLayout').classList.remove('hidden');
+          document.getElementById('gameLayout').classList.add('flex');
+
+          if (!window.isMultiplayerHost) {
+            // ================= CLIENT UPDATE =================
+            players = pList; currentRound = data.currentRound || 1; pathRemainder = data.pathRemainder || 0;
+            activeHazardsOnPath = data.activeHazardsOnPath || []; hazardCounts = data.hazardCounts || hazardCounts;
+
+            // Sync Log
+            if (data.logs && data.logs.length > 0) {
+              document.getElementById('logBox').innerHTML = data.logs.map(html => `<div class="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed">${html}</div>`).join('');
+            } else {
+              document.getElementById('logBox').innerHTML = '';
+            }
+
+            const sc = data.currentPathCards || [];
+            if (sc.length === 0) { document.getElementById('cardsScroll').innerHTML = ''; currentPathCards = []; } 
+            else if (sc.length > currentPathCards.length) {
+              for (let i = currentPathCards.length; i < sc.length; i++) {
+                currentPathCards.push(sc[i]); playSFX('flip'); renderCard(sc[i], i);
+              }
+            } else {
+               // Update claimed status visuals locally
+               sc.forEach((c, i) => { if(c.claimed) { const w = document.getElementById(`cWrap-${i}`); if(w) w.classList.add('claimed'); } });
+            }
+
+            // Sync Round Tracker Images
+            document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
+            for(let i=1; i<=5; i++) {
+              const tCard = document.getElementById(`tcard-${i}`);
+              tCard.className = 'temple-card flex-1 rounded-md';
+              if(i < currentRound) { tCard.style.backgroundImage = `var(--img-round-${i}-color)`; tCard.classList.add('temple-past'); }
+              else if(i === currentRound) { tCard.style.backgroundImage = `var(--img-round-${i}-color)`; tCard.classList.add('temple-current'); }
+              else { tCard.style.backgroundImage = `var(--img-round-${i}-bw)`; tCard.classList.add('temple-unexplored'); }
+            }
+
+            updateUI(); updateDeckTracker();
+
+            const me = players.find(p => String(p.id) === String(localPlayerId));
+
+            if (data.phase === 'game_ended') {
+               showFinalScore();
+            } else if (data.phase === 'round_ended') {
+              stopDecisionTimer(); setButtonsEnabled(false);
+              toggleActionUI('hideAll');
+              document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องเริ่มวิหารที่ ${currentRound + 1}...`;
+              document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
+              
+              // Trigger client shake exactly once per round end
+              if (!window.localCollapseAlerted && sc.length > 0 && sc[sc.length-1].type === 'hazard' && activeHazardsOnPath.includes(sc[sc.length-1].hType)) {
+                 window.localCollapseAlerted = true;
+                 playSFX('collapse');
+                 document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
+                 setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
+              }
+            } else {
+              window.localCollapseAlerted = false; // Reset for next rounds
+              toggleActionUI('decision');
+              if (me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
+                isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
+              } else if (me && (!me.inTemple || me.hasForfeited)) {
+                stopDecisionTimer(); setButtonsEnabled(false);
+                document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
+              }
+            }
+          } else {
+            // ================= HOST LOGIC =================
+            players = pList;
+            const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
+            const allChosen = activeHumans.every(p => p.currentChoice === 'explore' || p.currentChoice === 'return');
+            const turnKey = `${currentRound}_${currentPathCards.length}`;
+            
+            if (data.phase === 'game_ended') {
+               showFinalScore();
+            } else if (activeHumans.length > 0 && allChosen && lastProcessedTurnKey !== turnKey) {
+              lastProcessedTurnKey = turnKey;
+              stopDecisionTimer();
+              clearTimeout(gameTimeouts.bot);
+              const decisions = {};
+              players.forEach(p => { if (!p.inTemple || p.hasForfeited) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
+              processDecisions(decisions);
+            } else if (activeHumans.length === 0 && players.some(p => p.inTemple && p.isAI && !p.hasForfeited) && lastProcessedTurnKey !== turnKey) {
+              // No humans left, let bots finish the run instantly
+              lastProcessedTurnKey = turnKey;
+              stopDecisionTimer();
+              clearTimeout(gameTimeouts.bot);
+              gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
+            }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const p = new URLSearchParams(window.location.search); if (p.get('room')) { switchLobbyTab('multi'); document.getElementById('roomCodeInput').value = p.get('room'); }
+    });
+  </script>
+</body>
+</html>
