@@ -140,7 +140,7 @@
     }
     .custom-frame-active { background-image: var(--frame-player); filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6)); }
     .custom-frame-me { background-image: var(--frame-player); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.55)); }
-    .custom-frame-camped { background-image: var(--frame-player-camped); opacity: 0.85; }
+    .custom-frame-camped { background-image: var(--frame-player-camped); opacity: 0.85; filter: grayscale(15%); }
 
     .text-strong-shadow { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85); }
 
@@ -150,7 +150,7 @@
     .temple-past { border-color: #475569; opacity: 0.85; }
     .temple-unexplored { border-color: #334155; opacity: 0.8; }
 
-    /* 3D Card Flip (ปรับขนาดเหลือ 35%) */
+    /* 3D Card Flip (ปรับขนาด 35%) */
     .card-scene { perspective: 1200px; }
     .card-object { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s ease-out; transform: rotateY(180deg); }
     .card-object.flipped { transform: rotateY(0deg); }
@@ -159,7 +159,9 @@
     .card-face-front { transform: rotateY(0deg); }
     .card-face-front.hazard-card { border-color: #ef4444; }
     .card-face-front.artifact-card { border-color: #38bdf8; }
-    .card-scene.claimed { opacity: 0.35; transition: opacity 0.5s ease; }
+    
+    /* สไตล์เมื่อ Artifact โดนเก็บไปแล้วจะจางลง แทนที่จะคว่ำหน้า */
+    .card-scene.claimed { opacity: 0.35; transition: opacity 0.5s ease; filter: grayscale(50%); }
 
     .card-leftover { position: absolute; top: -8px; right: -8px; background: #f59e0b; color: #000; font-family: var(--font-title); font-size: 0.9rem; font-weight: 800; padding: 1px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.85); z-index: 20; border: 2px solid #fff; }
 
@@ -178,7 +180,7 @@
     .top-btn:hover { background: rgba(51, 65, 85, 0.9); }
 
     /* Timer Bar */
-    .timer-bar-container { width: 100%; height: 4px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+    .timer-bar-container { width: 100%; height: 5px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.1); }
     .timer-bar-fill { height: 100%; background: #facc15; width: 100%; transition: width 1s linear; }
   </style>
 </head>
@@ -322,8 +324,11 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             <span id="hazardBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-slate-900">0</span>
           </button>
+          <button onclick="openModal('modalLog')" class="top-btn text-amber-200" title="บันทึกการเดินทาง">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </button>
           <button onclick="openModal('modalRules')" class="top-btn text-sky-400 font-title font-bold text-lg" title="วิธีเล่น">?</button>
-          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ออกจากเกม">🏠</button>
+          <button onclick="forfeitGame()" class="top-btn text-rose-500 text-xl" title="ยอมแพ้/กลับหน้าแรก">🏠</button>
         </div>
       </div>
     </header>
@@ -685,6 +690,7 @@
       updateUI(); updateDeckTracker();
       log(`<span class="text-amber-400 font-bold text-sm">⛩️ เริ่มสำรวจวิหารที่ ${currentRound}/5</span>`);
 
+      // ในโหมดเล่นคนเดียวให้จั่วไพ่ใบแรกอัตโนมัติเลยโดยไม่ต้องรอ Host
       if (!isOnlineMode || window.isMultiplayerHost) {
         setTimeout(drawCard, 600);
       }
@@ -717,7 +723,7 @@
     function renderCard(card, idx) {
       const sc = document.getElementById('cardsScroll');
       const w = document.createElement('div');
-      // ขนาดการ์ด 35% เล็กกว่ากรอบ 
+      // ขนาดการ์ดลดลงเล็กน้อยให้พอดีกรอบ
       w.className = 'card-scene shrink-0 w-[84px] h-[126px] md:w-[98px] md:h-[147px] relative transition-opacity duration-500'; 
       w.id = `cWrap-${idx}`;
 
@@ -799,7 +805,7 @@
         window.syncHostStateToFirebase('decision');
       }
 
-      // ตรวจสอบว่าเหลือคนจริงที่ยังเล่นอยู่ไหม
+      // เช็คว่าเหลือใครอยู่ในวิหารบ้างไหม
       const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited);
       const me = players.find(p => String(p.id) === String(localPlayerId)) || players[0];
 
@@ -808,6 +814,7 @@
         document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
         setButtonsEnabled(false);
         if (!isOnlineMode || window.isMultiplayerHost) {
+          // ถ้าไม่มีคนจริงเหลือ ให้รันบอทอัตโนมัติเลยโดยไม่ค้างรอ
           setTimeout(() => runBotOnlyTurn(), 500);
         }
       } 
@@ -876,7 +883,7 @@
         if (returners.length === 1) {
           currentPathCards.forEach((c, i) => {
             if(c.type === 'artifact' && !c.claimed) {
-              c.claimed = true; // Mark to fade out
+              c.claimed = true; // Mark as claimed without flipping
               returners[0].chest += c.val;
               const w = document.getElementById(`cWrap-${i}`); 
               if(w) w.classList.add('claimed');
@@ -897,7 +904,7 @@
         if (isOnlineMode && window.isMultiplayerHost) window.syncHostStateToFirebase('round_ended');
         setTimeout(endRound, 800); 
       } else { 
-        setTimeout(drawCard, 400); // Faster draw for next loop
+        setTimeout(drawCard, 400); // Faster draw
       } 
     }
 
@@ -945,7 +952,7 @@
       isProcessing = true;
       stopDecisionTimer();
       setButtonsEnabled(false);
-      document.getElementById('statusNotice').innerText = `สิ้นสุดวิหารที่ ${currentRound}`;
+      document.getElementById('statusNotice').innerText = `สิ้นสุดการสำรวจวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
       currentPathCards.forEach(c => {
@@ -967,7 +974,8 @@
         if (!isOnlineMode) {
           setTimeout(() => { currentRound++; startNewRound(); }, 2500);
         } else if (window.isMultiplayerHost) {
-          setTimeout(() => { window.hostNextRoundMultiplayer(); }, 3500);
+          // แจ้งเตือน Host ให้ออกคำสั่งไปรอบถัดไป
+          document.getElementById('nextRoundBtn').style.display = 'block';
         }
       }
     }
@@ -990,7 +998,7 @@
       document.getElementById('pathRemainder').innerText = pathRemainder;
       const pg = document.getElementById('playersGrid'); pg.innerHTML = '';
       players.forEach(p => {
-        if (p.hasForfeited) return; // Hide forfeited players
+        if (p.hasForfeited) return; 
         const c = document.createElement('div');
         const isMe = String(p.id) === String(localPlayerId);
         const frameClass = p.inTemple
