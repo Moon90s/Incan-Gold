@@ -76,13 +76,11 @@
       --img-treasure-14: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-14_cfqfp1.jpg');
       --img-treasure-15: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-15_mvlfwh.jpg');
       --img-treasure-17: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-treasure-17_sgwswt.jpg');
-
       --img-artifact-1: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647330/Img-artifact-1_dh4jl0.jpg');
       --img-artifact-2: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-2_bkypdf.jpg');
       --img-artifact-3: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647331/Img-artifact-3_fg0khl.jpg');
       --img-artifact-4: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-4_ze1crw.jpg');
       --img-artifact-5: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/Img-artifact-5_x8yefg.jpg');
-
       --img-hazard-spider: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-spider_hnn4q9.jpg');
       --img-hazard-snake: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647333/img-hazard-snake_a3jqn6.jpg');
       --img-hazard-fire: url('https://res.cloudinary.com/dh6wsulnr/image/upload/v1792647332/img-hazard-fire_u2j4qh.jpg');
@@ -156,7 +154,7 @@
     .custom-frame-forfeited { background-image: var(--frame-player-camped); opacity: 0.4; filter: grayscale(100%); }
     .text-strong-shadow { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.85); }
 
-    /* Temple Round Cards */
+    /* Temple Round Cards - 100% Fit */
     .temple-card { background-size: 100% 100%; background-repeat: no-repeat; background-position: center; transition: all 0.3s ease; border: 2px solid transparent; }
     .temple-current { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.6); transform: scale(1.05); z-index: 10; filter: brightness(1.1); }
     .temple-past { border-color: #475569; opacity: 0.85; }
@@ -304,6 +302,7 @@
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
+        <!-- กองการ์ด & วัตถุโบราณ -->
         <div class="flex items-center gap-3 text-sm bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/70">
           <span class="flex items-center gap-1.5 text-amber-400 font-title font-bold">
             <i class="hz-ico w-6 h-6 drop-shadow" style="background-image:var(--icon-deck)"></i>
@@ -315,6 +314,7 @@
           </span>
         </div>
 
+        <!-- จำนวนการ์ดกับดัก -->
         <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/70 text-xs font-mono font-bold text-slate-200">
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-spider)"></i><span id="hz-spider">3</span></span>
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-snake)"></i><span id="hz-snake">3</span></span>
@@ -323,6 +323,7 @@
           <span class="flex items-center gap-0.5"><i class="hz-ico w-5 h-5" style="background-image:var(--icon-mummy)"></i><span id="hz-mummy">3</span></span>
         </div>
 
+        <!-- ปุ่มลัด -->
         <div class="flex items-center gap-1.5 ml-auto sm:ml-0">
           <button onclick="toggleAudio()" class="top-btn text-amber-400" title="เสียง">
             <svg id="soundIconOn" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
@@ -342,6 +343,7 @@
     </header>
 
     <div id="mainContainerWrapper" class="flex flex-col gap-2.5 z-10 w-full relative">
+      <!-- 1. เส้นทางวิหาร -->
       <div class="flex flex-col gap-1 shrink-0">
         <div class="flex items-center justify-between px-2">
           <div class="font-title font-bold text-amber-400 text-sm tracking-wide flex items-center gap-2 drop-shadow">
@@ -358,7 +360,9 @@
         </div>
       </div>
 
+      <!-- 2. ทีมนักสำรวจ + ปุ่มตัดสินใจ (ชิดกล่องหิน) -->
       <div class="flex flex-col gap-2.5 shrink-0 w-full relative z-20">
+        
         <div class="bg-slate-900/75 rounded-xl p-2.5 border border-slate-800 shadow-inner">
           <div class="flex items-center justify-between mb-2 px-1">
             <div class="text-xs font-title font-bold text-slate-300 flex items-center gap-1.5">
@@ -462,7 +466,7 @@
   </div>
 
   <script>
-    /* --- Modal & Utilities --- */
+    /* --- Modal, UI Toggle & Sound Logic --- */
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -473,6 +477,24 @@
       document.getElementById('multiModePanel').classList.toggle('flex', !isSingle);
       document.getElementById('tabSingleBtn').className = isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
       document.getElementById('tabMultiBtn').className = !isSingle ? 'py-2 rounded-lg font-title font-bold text-sm bg-amber-500 text-slate-950 transition-all' : 'py-2 rounded-lg font-title font-bold text-sm text-slate-300 hover:text-white transition-all';
+    }
+
+    function toggleActionUI(mode) {
+      const dec = document.getElementById('decisionControls');
+      const nxt = document.getElementById('nextRoundBtn');
+      if (mode === 'decision') {
+        dec.classList.remove('hidden');
+        dec.classList.add('grid');
+        nxt.classList.add('hidden');
+      } else if (mode === 'nextRound') {
+        dec.classList.add('hidden');
+        dec.classList.remove('grid');
+        nxt.classList.remove('hidden');
+      } else if (mode === 'hideAll') {
+        dec.classList.add('hidden');
+        dec.classList.remove('grid');
+        nxt.classList.add('hidden');
+      }
     }
 
     let audioCtx = null;
@@ -544,18 +566,19 @@
     let localPlayerId = 0;
     window.multiplayerLogs = [];
     window.localCollapseAlerted = false;
-    window.db = null;
-    let currentRoomCode = null;
-    let roomUnsubscribe = null;
-    let userStatusRef = null;
     
+    /* --- Timeout Management --- */
+    const gameTimeouts = { draw: null, bot: null, end: null };
+
     /* --- Timer Logic --- */
     let decisionTimer = null;
     let timeLeft = 15;
+    let isTimeUp = false;
 
     function startDecisionTimer() {
       clearInterval(decisionTimer);
       timeLeft = 15;
+      isTimeUp = false;
       const tc = document.getElementById('timerContainer');
       const tf = document.getElementById('timerFill');
       const notice = document.getElementById('statusNotice');
@@ -574,11 +597,12 @@
 
         if(timeLeft <= 0) {
           clearInterval(decisionTimer);
+          isTimeUp = true;
           notice.innerText = "หมดเวลา! บังคับกลับเต็นท์";
           notice.classList.remove('animate-pulse');
           notice.classList.add('text-rose-400');
           const me = players.find(p => String(p.id) === String(localPlayerId));
-          if(me && me.inTemple && !me.currentChoice && !me.hasForfeited) {
+          if(me && me.inTemple && !me.currentChoice) {
             handleChoice('return'); 
           }
         } else {
@@ -616,7 +640,6 @@
         const meIdx = players.findIndex(p => String(p.id) === String(localPlayerId));
         if(meIdx >= 0) {
            import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(async ({ref, update}) => {
-              // มาร์คสถานะตัวเองเป็นออกเกม ให้ Host ประมวลผลต่อได้ทันที
               await update(ref(window.db, `rooms/${currentRoomCode}/players/${meIdx}`), {
                 inTemple: false, bag: 0, chest: 0, currentChoice: 'return', hasForfeited: true, isOffline: true
               });
@@ -980,6 +1003,7 @@
       isProcessing = true;
       stopDecisionTimer();
       setButtonsEnabled(false);
+      toggleActionUI('hideAll'); 
       document.getElementById('statusNotice').innerText = `สิ้นสุดการสำรวจวิหารที่ ${currentRound}`;
       document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
 
@@ -1001,449 +1025,6 @@
         if (!isOnlineMode) {
           setTimeout(() => { currentRound++; startNewRound(); }, 2000);
         } else if (window.isMultiplayerHost) {
-          // แจ้งเตือน Host ให้ออกคำสั่งไปรอบถัดไป
-          document.getElementById('nextRoundBtn').style.display = 'block';
-        }
-      }
-    }
-
-    function showFinalScore() {
-      updateUI(true); 
-      const s = [...players].filter(p => !p.hasForfeited && !p.isOffline).sort((a,b) => b.chest - a.chest);
-      const rList = document.getElementById('rankList'); rList.innerHTML = '';
-      s.forEach((p, i) => {
-        const el = document.createElement('div');
-        const isMe = String(p.id) === String(localPlayerId);
-        el.className = `flex justify-between items-center px-4 py-2.5 rounded-xl border ${i===0 ? 'bg-amber-900/40 border-amber-500' : 'bg-slate-900/50 border-slate-700'}`;
-        el.innerHTML = `<div class="flex items-center gap-3"><span class="w-6 text-xl text-center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span><span class="font-title font-bold text-base ${isMe ? 'text-amber-300':'text-slate-200'}">${p.name}</span></div><div class="font-title font-bold text-amber-400 text-lg">${p.chest} 💎</div>`;
-        rList.appendChild(el);
-      });
-      openModal('summaryModal');
-    }
-
-    function updateUI(revealTents = false) {
-      document.getElementById('pathRemainder').innerText = pathRemainder;
-      const pg = document.getElementById('playersGrid'); pg.innerHTML = '';
-      players.forEach(p => {
-        const c = document.createElement('div');
-        const isMe = String(p.id) === String(localPlayerId);
-        
-        // จัดการสถานะการ์ดผู้เล่น
-        let frameClass = 'custom-frame-active';
-        let statusBadge = '';
-        let opacityClass = '';
-
-        if (p.hasForfeited || p.isOffline) {
-           frameClass = 'custom-frame-forfeited';
-           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[9px] font-bold font-title bg-rose-950/90 text-rose-400 border border-rose-500/50">ออกเกม</span>`;
-           opacityClass = 'opacity-50';
-        } else if (!p.inTemple) {
-           frameClass = 'custom-frame-camped';
-           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-sky-950/90 text-sky-300 border border-sky-500/50 shadow">กลับ</span>`;
-        } else {
-           if(isMe) frameClass = 'custom-frame-me';
-           statusBadge = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold font-title bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 shadow">ลุย</span>`;
-        }
-
-        c.className = `player-frame-box rounded-xl ${frameClass} ${opacityClass}`;
-        c.id = `player-${p.id}`; 
-        
-        const tStr = (isMe || revealTents) ? p.chest : '?';
-        
-        c.innerHTML = `
-          <div class="flex justify-between items-center gap-1 px-1">
-            <span class="font-title font-bold text-xs sm:text-sm truncate ${isMe ? 'text-amber-200' : 'text-white'} text-strong-shadow">
-              ${p.name.split(' ')[0]}${isMe ? ' (คุณ)' : ''}
-            </span>
-            ${statusBadge}
-          </div>
-          <div class="flex justify-between items-center bg-black/55 px-2.5 py-1 rounded-lg border border-white/10">
-            <div class="flex items-center gap-1.5">
-              <div class="icon-bag w-5 h-5 shrink-0 drop-shadow"></div>
-              <span class="font-mono font-bold text-amber-300 text-sm text-strong-shadow">${p.bag}</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <div class="icon-tent w-5 h-5 shrink-0 drop-shadow"></div>
-              <span class="font-mono font-bold text-slate-100 text-sm text-strong-shadow">${tStr}</span>
-            </div>
-          </div>
-        `;
-        pg.appendChild(c);
-      });
-    }
-
-    function updateDeckTracker() {
-      document.getElementById('deckCount').innerText = deck.length;
-      document.getElementById('artCount').innerText = deck.filter(c => c.type === 'artifact').length;
-      
-      let dangerCount = 0;
-      HAZARD_TYPES.forEach(h => {
-        const remaining = hazardCounts[h.id];
-        const drawn = activeHazardsOnPath.filter(x => x === h.id).length;
-        
-        const topHz = document.getElementById(`hz-${h.id}`);
-        if(topHz) {
-          topHz.innerText = remaining;
-          if(drawn > 0) topHz.parentElement.classList.add('text-rose-400', 'animate-pulse');
-          else topHz.parentElement.classList.remove('text-rose-400', 'animate-pulse');
-        }
-
-        const modSpan = document.getElementById(`hzMod-${h.id}`);
-        const statSpan = document.getElementById(`hzStat-${h.id}`);
-        const row = document.getElementById(`hzRow-${h.id}`);
-        if(modSpan) modSpan.innerText = remaining;
-        
-        if(drawn > 0) {
-          dangerCount++;
-          if(statSpan) { statSpan.innerText = "⚠️ เตือนภัย!"; statSpan.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-950 text-rose-300 border border-rose-600 animate-pulse"; }
-          if(row) row.classList.add('border-rose-800/80');
-        } else {
-          if(statSpan) { statSpan.innerText = "ปลอดภัย"; statSpan.className = "text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700"; }
-          if(row) row.classList.remove('border-rose-800/80');
-        }
-      });
-
-      const badge = document.getElementById('hazardBadge');
-      if(dangerCount > 0) { badge.innerText = dangerCount; badge.classList.remove('hidden'); }
-      else { badge.classList.add('hidden'); }
-    }
-
-    function log(msg) {
-      const box = document.getElementById('logBox');
-      const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const logHtml = `<span class="text-[10px] text-slate-400 font-mono mr-1">[${time}]</span> <span class="text-[11px] md:text-xs">${msg}</span>`;
-      const d = document.createElement('div'); 
-      d.className = 'bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed'; 
-      d.innerHTML = logHtml;
-      box.prepend(d);
-
-      if (!isOnlineMode || window.isMultiplayerHost) {
-        window.multiplayerLogs.unshift(logHtml);
-        if(window.multiplayerLogs.length > 40) window.multiplayerLogs.pop();
-      }
-    }
-  </script>
-
-  <!-- ================= ระบบหลังบ้าน FIREBASE MULTIPLAYER ================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, get, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    /* =========================================================================
-       📌 วางค่า firebaseConfig
-       ========================================================================= */
-    const firebaseConfig = {
- 	    apiKey: "AIzaSyD0pj6su4PILlILEVeWr3bwz7UNf5c_DcI",
-  	  authDomain: "incan-gold-deluxe.firebaseapp.com",
-  	  databaseURL: "https://incan-gold-deluxe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  	  projectId: "incan-gold-deluxe",
-  	  storageBucket: "incan-gold-deluxe.firebasestorage.app",
-  	  messagingSenderId: "1034905115077",
-  	  appId: "1:1034905115077:web:ead1c2f72f305c3397d3ac",
-  	  measurementId: "G-RG4JJLMFXL"
-    };
-
-    const statusEl = document.getElementById('firebaseStatusText');
-    window.db = null;
-    let currentRoomCode = null;
-    let roomUnsubscribe = null;
-    let lastProcessedTurnKey = "";
-    window.isMultiplayerHost = false;
-
-    const hasValidKey = firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
-    if (!hasValidKey) {
-      statusEl.innerHTML = "⚠️ <b>ทดสอบเล่นคนเดียว (ไม่เชื่อมต่อ Firebase)</b>";
-      statusEl.className = "text-[11px] text-amber-400 text-center bg-amber-950/40 p-2 rounded-lg";
-    } else {
-      try {
-        const app = initializeApp(firebaseConfig);
-        window.db = getDatabase(app);
-        statusEl.innerHTML = "🟢 <b>พร้อมเล่นออนไลน์</b>";
-        statusEl.className = "text-[11px] text-emerald-400 text-center";
-      } catch (err) {
-        statusEl.innerHTML = "❌ <b>ตั้งค่า Firebase ผิดพลาด:</b> " + err.message;
-      }
-    }
-
-    let waitingRoomPlayers = [];
-
-    function getOrCreatePlayerIdentity() {
-      const pName = document.getElementById('playerNameInput').value.trim() || 'นักสำรวจ';
-      let savedId = sessionStorage.getItem('incan_player_uid');
-      if (!savedId) { savedId = 'p_' + Math.random().toString(36).substring(2, 9); sessionStorage.setItem('incan_player_uid', savedId); }
-      localPlayerId = savedId;
-      return { id: savedId, name: pName };
-    }
-
-    // ================= PRESENCE SYSTEM (ตรวจสอบการเชื่อมต่อ) =================
-    function setupPresence(roomCode, playerId) {
-      if(!window.db) return;
-      const myStatusRef = ref(window.db, `rooms/${roomCode}/presence/${playerId}`);
-      const connectedRef = ref(window.db, '.info/connected');
-
-      onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-          // หากเชื่อมต่อสำเร็จ ให้บอกว่า Online 
-          set(myStatusRef, { isOffline: false });
-          // หากเน็ตหลุด/ปิดเว็บ ให้ Firebase รีบเปลี่ยนค่าเป็น Offline อัตโนมัติ
-          onDisconnect(myStatusRef).set({ isOffline: true });
-        }
-      });
-    }
-
-    window.handleCreateOnlineRoom = async function() {
-      initAudio();
-      if (!window.db) { alert("ขาดการเชื่อมต่อ Database"); return; }
-
-      const me = getOrCreatePlayerIdentity();
-      currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
-      window.isMultiplayerHost = true;
-
-      waitingRoomPlayers = [{ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false, isOffline: false }];
-      waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers, parseInt(document.getElementById('onlineTargetTotal').value, 10));
-
-      await set(ref(window.db, `rooms/${currentRoomCode}`), { 
-        status: 'waiting', 
-        hostId: me.id, 
-        currentRound: 1, 
-        pathRemainder: 0, 
-        players: waitingRoomPlayers, 
-        updatedAt: Date.now() 
-      });
-
-      setupPresence(currentRoomCode, me.id);
-
-      document.getElementById('multiEntryBox').classList.add('hidden');
-      document.getElementById('waitingRoomBox').classList.remove('hidden');
-      document.getElementById('waitingRoomBox').classList.add('flex');
-      document.getElementById('hostBotControls').classList.remove('hidden');
-      document.getElementById('btnHostStartOnline').classList.remove('hidden');
-      document.getElementById('displayRoomCode').innerText = currentRoomCode;
-
-      subscribeRoom(currentRoomCode);
-    };
-
-    window.handleJoinOnlineRoom = async function() {
-      initAudio();
-      const code = document.getElementById('roomCodeInput').value.trim();
-      if (!code || !window.db) return;
-
-      const me = getOrCreatePlayerIdentity();
-      const roomRef = ref(window.db, `rooms/${code}`);
-      const snap = await get(roomRef);
-
-      if (!snap.exists()) { alert('ไม่พบห้อง!'); return; }
-      const data = snap.val();
-      
-      let pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
-      let humans = pList.filter(p => !p.isAI);
-      const existingIdx = humans.findIndex(p => String(p.id) === String(me.id));
-      
-      if (existingIdx >= 0) {
-        humans[existingIdx].name = me.name;
-        humans[existingIdx].isOffline = false; // กลับมาออนไลน์
-      } else {
-        if (data.status === 'playing') { alert('ห้องนี้เริ่มเล่นไปแล้ว ไม่สามารถเข้าร่วมกลางคันได้ครับ'); return; }
-        if (humans.length >= 8) { alert('ห้องเต็ม!'); return; }
-        humans.push({ id: me.id, name: me.name, isAI: false, inTemple: true, bag: 0, chest: 0, currentChoice: null, hasForfeited: false, isOffline: false });
-      }
-
-      const targetCount = Math.max(humans.length, Math.min(8, pList.length));
-      const updatedList = buildCombinedPlayerList(humans, pList.filter(p=>p.isAI).length > 0 ? targetCount : 0);
-
-      currentRoomCode = code;
-      window.isMultiplayerHost = (String(data.hostId) === String(me.id));
-
-      await update(roomRef, { players: updatedList, updatedAt: Date.now() });
-
-      setupPresence(code, me.id);
-
-      document.getElementById('multiEntryBox').classList.add('hidden');
-      document.getElementById('waitingRoomBox').classList.remove('hidden');
-      document.getElementById('waitingRoomBox').classList.add('flex');
-      document.getElementById('hostBotControls').classList.toggle('hidden', !window.isMultiplayerHost);
-      document.getElementById('btnHostStartOnline').classList.toggle('hidden', !window.isMultiplayerHost);
-      document.getElementById('displayRoomCode').innerText = currentRoomCode;
-
-      subscribeRoom(code);
-    };
-
-    function buildCombinedPlayerList(humanList, targetTotal) {
-      let combined = [...humanList];
-      if (targetTotal > humanList.length) {
-        const needBots = Math.min(8 - humanList.length, targetTotal - humanList.length);
-        for (let i = 0; i < needBots; i++) {
-          const b = BOT_PROFILES[i % BOT_PROFILES.length];
-          combined.push({ id: 'bot_'+(i+1), name: b.n+' (AI)', isAI: true, inTemple: true, bag: 0, chest: 0, profile: b.p, riskBase: b.riskBase, riskMod: 0, currentChoice: null, hasForfeited: false, isOffline: false });
-        }
-      }
-      return combined;
-    }
-
-    window.updateOnlineBotsCount = async function() {
-      const targetTotal = parseInt(document.getElementById('onlineTargetTotal').value, 10);
-      waitingRoomPlayers = buildCombinedPlayerList(waitingRoomPlayers.filter(p => !p.isAI), targetTotal);
-      renderWaitingRoomPlayers(waitingRoomPlayers);
-      if (window.db && currentRoomCode && window.isMultiplayerHost) await update(ref(window.db, `rooms/${currentRoomCode}`), { players: waitingRoomPlayers, updatedAt: Date.now() });
-    };
-
-    function renderWaitingRoomPlayers(list) {
-      document.getElementById('waitingPlayerCount').innerText = list.length;
-      document.getElementById('waitingPlayersList').innerHTML = list.map(p => `<div class="px-2 py-1 rounded bg-slate-800 border ${String(p.id) === String(localPlayerId) ? 'border-amber-400' : 'border-slate-700'} text-xs font-bold truncate">${p.isAI ? '🤖' : '🤠'} ${p.name}</div>`).join('');
-    }
-
-    window.hostStartMultiplayerGame = function() {
-      isOnlineMode = true; startGame(waitingRoomPlayers);
-    };
-
-    window.shareRoomUrl = function() {
-      const url = `${window.location.origin}${window.location.pathname}?room=${currentRoomCode}`;
-      if (navigator.share) navigator.share({ title: 'Incan Gold Deluxe', url });
-      else { navigator.clipboard.writeText(url); alert(`คัดลอกลิงก์ห้องแล้ว:\n${url}`); }
-    };
-
-    window.syncHostStateToFirebase = async function(phase) {
-      if (!window.db || !currentRoomCode || !window.isMultiplayerHost) return;
-      await update(ref(window.db, `rooms/${currentRoomCode}`), { status: 'playing', phase, currentRound, pathRemainder, deckCount: deck.length, currentPathCards, activeHazardsOnPath, hazardCounts, players, logs: window.multiplayerLogs, updatedAt: Date.now() });
-    };
-
-    window.submitMultiplayerChoice = async function(choice) {
-      if (!window.db || !currentRoomCode) return;
-      const idx = players.findIndex(p => String(p.id) === String(localPlayerId));
-      if (idx >= 0) await update(ref(window.db, `rooms/${currentRoomCode}/players/${idx}`), { currentChoice: choice });
-    };
-
-    window.hostNextRoundMultiplayer = function() {
-      currentRound++; startNewRound(); window.syncHostStateToFirebase('drawing');
-    };
-
-    function subscribeRoom(code) {
-      if (roomUnsubscribe) roomUnsubscribe();
-      roomUnsubscribe = onValue(ref(window.db, `rooms/${code}`), (snap) => {
-        const data = snap.val();
-        if (!data) return;
-        const pList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
-        
-        // Host Update Offline Status from Presence Nodes
-        if (window.isMultiplayerHost && data.status === 'playing' && data.presence) {
-           let stateChanged = false;
-           pList.forEach((p, idx) => {
-              if(!p.isAI && data.presence[p.id] && data.presence[p.id].isOffline === true) {
-                 if(!p.isOffline || !p.hasForfeited) {
-                    p.isOffline = true;
-                    p.hasForfeited = true;
-                    p.inTemple = false;
-                    p.bag = 0;
-                    p.chest = 0;
-                    p.currentChoice = 'return';
-                    stateChanged = true;
-                 }
-              }
-           });
-           if(stateChanged) {
-              players = pList;
-              update(ref(window.db, `rooms/${code}/players`), players);
-           }
-        }
-
-        if (data.status === 'waiting') {
-          waitingRoomPlayers = pList; renderWaitingRoomPlayers(pList); return;
-        }
-
-        if (data.status === 'playing') {
-          isOnlineMode = true;
-          document.getElementById('lobbyScreen').classList.add('hidden');
-          document.getElementById('gameLayout').classList.remove('hidden');
-          document.getElementById('gameLayout').classList.add('flex');
-
-          if (!window.isMultiplayerHost) {
-            // Client Update
-            players = pList; currentRound = data.currentRound || 1; pathRemainder = data.pathRemainder || 0;
-            activeHazardsOnPath = data.activeHazardsOnPath || []; hazardCounts = data.hazardCounts || hazardCounts;
-
-            if (data.logs && data.logs.length > 0) {
-              document.getElementById('logBox').innerHTML = data.logs.map(html => `<div class="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-700/60 shadow-sm leading-relaxed">${html}</div>`).join('');
-            } else {
-              document.getElementById('logBox').innerHTML = '';
-            }
-
-            const sc = data.currentPathCards || [];
-            if (sc.length === 0) { document.getElementById('cardsScroll').innerHTML = ''; currentPathCards = []; } 
-            else if (sc.length > currentPathCards.length) {
-              for (let i = currentPathCards.length; i < sc.length; i++) {
-                currentPathCards.push(sc[i]); playSFX('flip'); renderCard(sc[i], i);
-              }
-            } else {
-               sc.forEach((c, i) => { if(c.claimed) { const w = document.getElementById(`cWrap-${i}`); if(w) w.classList.add('claimed'); } });
-            }
-
-            document.getElementById('currentRoundDisplay').innerHTML = `${currentRound}<span class="text-sm text-slate-400">/5</span>`;
-            for(let i=1; i<=5; i++) {
-              const tCard = document.getElementById(`tcard-${i}`);
-              tCard.className = 'temple-card flex-1 rounded-md';
-              if(i < currentRound) { tCard.style.backgroundImage = `var(--img-round-${i}-color)`; tCard.classList.add('temple-past'); }
-              else if(i === currentRound) { tCard.style.backgroundImage = `var(--img-round-${i}-color)`; tCard.classList.add('temple-current'); }
-              else { tCard.style.backgroundImage = `var(--img-round-${i}-bw)`; tCard.classList.add('temple-unexplored'); }
-            }
-
-            updateUI(); updateDeckTracker();
-
-            const me = players.find(p => String(p.id) === String(localPlayerId));
-            
-            if(data.phase === 'round_ended' && sc.length > 0 && sc[sc.length-1].type === 'hazard') {
-               const lastC = sc[sc.length-1];
-               if(activeHazardsOnPath.includes(lastC.hType)) {
-                 if(!window.localCollapseAlerted) {
-                    window.localCollapseAlerted = true;
-                    playSFX('collapse');
-                    document.getElementById('mainContainerWrapper').classList.add('shake-collapse');
-                    setTimeout(() => document.getElementById('mainContainerWrapper').classList.remove('shake-collapse'), 650);
-                 }
-               }
-            }
-
-            if (data.phase === 'game_ended') {
-               showFinalScore();
-            } else if (data.phase === 'round_ended') {
-              stopDecisionTimer(); setButtonsEnabled(false);
-              document.getElementById('statusNotice').innerText = `รอหัวหน้าห้องเริ่มวิหารที่ ${currentRound + 1}...`;
-              document.getElementById('statusNotice').className = "text-[10px] font-title text-slate-400 font-bold mb-0.5 text-right w-full truncate";
-            } else if (me && me.inTemple && !me.currentChoice && !me.hasForfeited && !me.isOffline) {
-              isProcessing = false; setButtonsEnabled(true); startDecisionTimer();
-            } else if (me && (!me.inTemple || me.hasForfeited || me.isOffline)) {
-              stopDecisionTimer(); setButtonsEnabled(false);
-              document.getElementById('statusNotice').innerText = "คุณอยู่ในเต็นท์แล้ว กำลังสำรวจต่อ...";
-            }
-          } else {
-            // Host logic checks
-            players = pList;
-            const activeHumans = players.filter(p => p.inTemple && !p.isAI && !p.hasForfeited && !p.isOffline);
-            const allChosen = activeHumans.every(p => p.currentChoice === 'explore' || p.currentChoice === 'return');
-            const turnKey = `${currentRound}_${currentPathCards.length}`;
-            
-            if (data.phase === 'game_ended') {
-               showFinalScore();
-            } else if (activeHumans.length > 0 && allChosen && lastProcessedTurnKey !== turnKey) {
-              lastProcessedTurnKey = turnKey;
-              stopDecisionTimer();
-              clearTimeout(gameTimeouts.bot);
-              const decisions = {};
-              players.forEach(p => { if (!p.inTemple || p.hasForfeited || p.isOffline) return; decisions[p.id] = p.isAI ? calcSmartBotDecision(p) : p.currentChoice; });
-              processDecisions(decisions);
-            } else if (activeHumans.length === 0 && players.some(p => p.inTemple && p.isAI && !p.hasForfeited && !p.isOffline) && lastProcessedTurnKey !== turnKey) {
-              lastProcessedTurnKey = turnKey;
-              stopDecisionTimer();
-              clearTimeout(gameTimeouts.bot);
-              gameTimeouts.bot = setTimeout(() => runBotOnlyTurn(), 500);
-            }
-          }
-        }
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const p = new URLSearchParams(window.location.search); if (p.get('room')) { switchLobbyTab('multi'); document.getElementById('roomCodeInput').value = p.get('room'); }
-    });
-  </script>
-</body>
-</html>
+          setTimeout(() => {
+             toggleActionUI('nextRound');
+             document.getElementById('
